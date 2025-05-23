@@ -1,0 +1,88 @@
+#' Fit a RS-BIRM model
+#'
+#' Fits a RS-BIRM model to the data.
+#' @param data data frame with the data
+#' @param stan_model path to the stan model file
+#' @param theta_n number of latent traits
+#' @param x_vec vector of item codings
+#' @param T_vec vector of item numbers per trait
+#' @param iter number of iterations
+#' @param warmup number of warmup iterations
+#' @param chains number of chains
+#' @param seed random seed
+#' @param adapt_delta adaptation delta
+#' @param prefix Should only variables with the prefix be analyzed? Default is NULL
+#' @return a stanfit object
+#' @import cmdstanr 
+#' @examples
+#' results <- fit_stan(df, stan_model = "stan/ARS_ERS.stan", theta_n = 2, 
+#'                     x_vec = c(rep(1, 4), rep(-1, 4)), iter = 8000, warmup = 4000, chains = 6, 
+#'                     seed = sample(1:1e9, 1), adapt_delta = 0.9, prefix = "observed", init_vals = TRUE)
+#' @export
+
+
+fit_stan <- function(
+    data, stan_model, theta_n, x_vec, T_vec = "auto", 
+    iter = 8000, warmup = 4000, chains = 6, seed = sample(1:1e9, 1), adapt_delta = 0.9, 
+    prefix = "observed", ars_prior = 0.9, init_vals = TRUE) {
+
+  
+  if (!is.null(prefix)) data_cols <- grepl(prefix, colnames(data))
+  
+  data <- data[, data_cols]
+  
+  if (T_vec[1] == "auto") T_vec <- rep(ncol(data)/theta_n, theta_n)
+  
+  
+
+    # data[data > 1 - 1e-10] <- 1 - 1e-10
+    # data[data < 1e-10] <- 1e-10
+    data[data > .9999] <- 0.9999
+    data[data < .0001] <- 0.0001
+  # see paper from Noel & Dauvier
+  
+
+
+  n <- nrow(data)
+
+  # Package into a list for Stan
+  if (theta_n == 1) stan_data <- list(N = n, T = array(T_vec, dim = c(1)), x = x_vec, r = as.matrix(data), theta_n = theta_n, ars_prior = ars_prior)
+  if (theta_n > 1) stan_data <- list(N = n, T = T_vec, x = x_vec, r = as.matrix(data), theta_n = theta_n, ars_prior = ars_prior)
+
+  set.seed(seed)
+
+  # cmd al
+  stan_model <- cmdstan_model(
+    stan_model
+  )
+
+  common_inits <- list(
+      theta = matrix(rnorm(n * (theta_n + 1), 0, 1), nrow = n, ncol = theta_n + 1),  # Random initialization
+      ars = rnorm(n, 0, 1),  # Random initialization for ars
+      delta = rnorm(ncol(data), 0, 5),  # Random initialization for delta
+      tau = rep(1.5, ncol(data)),  # A reasonable starting value for tau
+      sigma = rep(1, theta_n + 1),  # A reasonable starting value for sigma
+      Sigma_corr = diag(theta_n + 1)  # Start with identity correlation matrix
+  )
+
+  if (init_vals == TRUE) {
+    init <- rep(list(common_inits), chains)
+  } else {
+    init = NULL
+  }
+
+
+  fit <- stan_model$sample(
+    data = stan_data,
+    seed = seed,
+    chains = chains,
+    iter_warmup = warmup,
+    iter_sampling = iter,
+    adapt_delta = adapt_delta,
+    parallel_chains = chains,
+    init = init,
+  )
+
+  return(fit)
+}
+
