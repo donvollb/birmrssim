@@ -24,7 +24,7 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
 
   set.seed(seed)
 
-  
+  # simulate values if none were set
   if (item_n[1] == "auto") item_n <- rep(10, theta_n)
   if (var_thetas[1] == "auto") var_thetas <- rep(1, theta_n)
   if (cor_thetas[1] == "auto") cor_thetas <- runif((theta_n*(theta_n - 1))/2, -0.4, 0.4)
@@ -74,20 +74,26 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
   Sigma[1:theta_n, theta_n + 1] <- cov_ers_vec  # fill covariances between theta and ERS
   Sigma[theta_n + 1, 1:theta_n] <- cov_ers_vec  # ensure symmetry
 
+  # start the dataframe
   df <- data.frame(
     id = 1:n
   )
 
+  # simulate latent traits and ERS from the covariance matrix
   df[, c(paste0("theta", 1:theta_n), "ers")] <- MASS::mvrnorm(
     n = n,
     mu = rep(0, theta_n + 1),
     Sigma = Sigma
   )
 
+  # simulate ARS
   df$ars <- rnorm(n, 0, sqrt(var_ars))
 
+
+  # create variable for items
   items_total <- sum(item_n)
   
+  # create x vector
   x_vec <- NULL
   for (i in 1:theta_n) {
 
@@ -98,6 +104,7 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
 
   }
 
+  # create item parameters
   items <- data.frame(
     item_id = 1:items_total,
     delta = c(0, runif(items_total - 1, -3, 3)),
@@ -105,6 +112,8 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
     x = x_vec
   )
 
+  # simulate item responses
+  # helper
   e <- 0
   
   for (i in 1:theta_n) {
@@ -112,6 +121,7 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
     
     for (k in 1:item_n[i]) {
 
+      # which item?
       f <- e + k
 
       
@@ -139,6 +149,7 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
     e <- e + item_n[i]
   }
 
+  # return data and item parameters
   return(list(df = df, items = items))
 
 } 

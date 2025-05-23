@@ -4,7 +4,7 @@
 \alias{one_simulation}
 \title{Simulates data, fits a model and summarizes the fit}
 \usage{
-one_simulation(shorten = TRUE, ...)
+one_simulation(...)
 }
 \arguments{
 \item{...}{arguments passed to \code{\link{dgp_birm_rs}}, \code{\link{fit_stan}} and \code{\link{summarize_fit}}}

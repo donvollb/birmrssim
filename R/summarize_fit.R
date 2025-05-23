@@ -13,10 +13,12 @@
 #' @export
 
 summarize_fit <- function(fit, df_list, theta_n = "auto") {
-  # True values
+
+  # get true values
   true <- df_list$df
   items <- df_list$items
 
+  # get the number of thetas if not specified
   if (theta_n == "auto") grepl("theta", colnames(true)) %>% sum(.) -> theta_n
 
   # Custom RMSE function
@@ -24,11 +26,11 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
     sqrt(mean((post_val - true_val)^2))
   }
 
-  # Extract posterior means
+  # Extract relevant posterior means
   means <- fit$summary(variables = c("theta", "ars", "delta", "tau")) |>
     select(variable, mean)
 
-  # Dynamically extract theta components
+  # Dynamically extract thetas
   theta_estimates <- list()
   for (i in 1:theta_n) {
     var_name <- paste0("theta_", i)
@@ -126,7 +128,7 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
   waic_p <- waic_result$pointwise[, "p_waic"]
   result$p_waic_bad_prop <- mean(waic_p > 0.4, na.rm = TRUE)
 
-
+  # Compute ESS and Rhat
   ess_hats <- fit$summary(variables = NULL, 
     rhat, ess_bulk, ess_tail)
 

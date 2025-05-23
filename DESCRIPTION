@@ -1,4 +1,4 @@
-Package: rs.sim
+Package: rssim
 Title: Simulate data for an test the RS-Beta Item Response Model (RS-BIRM).
 Version: 0.0.0.9000
 Authors@R: 

@@ -27,10 +27,13 @@ fit_stan <- function(
     prefix = "observed", ars_prior = 0.9, init_vals = TRUE) {
 
   
+  # if there is no prefix, use all columns
   if (!is.null(prefix)) data_cols <- grepl(prefix, colnames(data))
   
   data <- data[, data_cols]
   
+  # if T_vec is auto, set it to the number of columns divided by theta_n
+  # that would mean that each theta would have the same number of items
   if (T_vec[1] == "auto") T_vec <- rep(ncol(data)/theta_n, theta_n)
   
   
@@ -51,27 +54,33 @@ fit_stan <- function(
 
   set.seed(seed)
 
-  # cmd al
+  # load the model (and compile if necessary)
   stan_model <- cmdstan_model(
     stan_model
   )
 
-  common_inits <- list(
+
+
+  # inital values (if relevant)
+  if (init_vals == TRUE) {
+
+    common_inits <- list(
       theta = matrix(rnorm(n * (theta_n + 1), 0, 1), nrow = n, ncol = theta_n + 1),  # Random initialization
       ars = rnorm(n, 0, 1),  # Random initialization for ars
       delta = rnorm(ncol(data), 0, 5),  # Random initialization for delta
       tau = rep(1.5, ncol(data)),  # A reasonable starting value for tau
       sigma = rep(1, theta_n + 1),  # A reasonable starting value for sigma
       Sigma_corr = diag(theta_n + 1)  # Start with identity correlation matrix
-  )
-
-  if (init_vals == TRUE) {
+      )
+    
     init <- rep(list(common_inits), chains)
+
   } else {
     init = NULL
   }
 
 
+  # fit the stan model
   fit <- stan_model$sample(
     data = stan_data,
     seed = seed,
