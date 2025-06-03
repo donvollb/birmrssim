@@ -17,7 +17,7 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
   items <- df_list$items
 
   # get the number of thetas if not specified
-  if (theta_n == "auto") grepl("theta", colnames(true)) |> sum(.) -> theta_n
+  if (theta_n == "auto") grepl("theta", colnames(true)) |> sum() -> theta_n
 
   # Custom RMSE function
   rmse <- function(post_val, true_val) {
@@ -127,8 +127,7 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
   result$p_waic_bad_prop <- mean(waic_p > 0.4, na.rm = TRUE)
 
   # Compute ESS and Rhat
-  ess_hats <- fit$summary(variables = NULL, 
-    rhat, ess_bulk, ess_tail)
+  ess_hats <- fit$summary(variables = NULL, c("rhat", "ess_bulk", "ess_tail"))
 
   # Return both result row and posterior means
   return(list(
