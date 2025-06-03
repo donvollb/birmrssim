@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_stan.R
 \name{fit_stan}
 \alias{fit_stan}
-\title{Fit a RS-BIRM model}
+\title{Fit a BIRM-RS model}
 \usage{
 fit_stan(
   data,
@@ -21,33 +21,37 @@ fit_stan(
 )
 }
 \arguments{
-\item{data}{data frame with the data}
+\item{data}{Data frame containing the observed data.}
 
-\item{stan_model}{path to the stan model file}
+\item{stan_model}{Path to the Stan model file.}
 
-\item{theta_n}{number of latent traits}
+\item{theta_n}{Number of latent traits.}
 
-\item{x_vec}{vector of item codings}
+\item{x_vec}{Vector indicating reverse-scored items (1 = normally scored, -1 = reverse-scored).}
 
-\item{T_vec}{vector of item numbers per trait}
+\item{T_vec}{Vector specifying the number of items per trait. Defaults to "auto", which sets it to the total number of items divided by theta_n.}
 
-\item{iter}{number of iterations}
+\item{iter}{Number of iterations (excluding warmup).}
 
-\item{warmup}{number of warmup iterations}
+\item{warmup}{Number of warmup iterations.}
 
-\item{chains}{number of chains}
+\item{chains}{Number of MCMC chains.}
 
-\item{seed}{random seed}
+\item{seed}{Random seed for reproducibility.}
 
-\item{adapt_delta}{adaptation delta}
+\item{adapt_delta}{Target acceptance rate for step size adaptation in Stan. Defaults to 0.9.}
 
-\item{prefix}{Should only variables with the prefix be analyzed? Default is NULL}
+\item{prefix}{Optional prefix indicating which variables to analyze. Default is "observed". If NULL, all columns are used.}
+
+\item{ars_prior}{Prior for the ARS parameter. Default is 0.9.}
+
+\item{init_vals}{Logical; indicates whether to use initial values. Default is FALSE.}
 }
 \value{
-a stanfit object
+A stanfit object representing the fitted model.
 }
 \description{
-Fits a RS-BIRM model to the data.
+Fits a BIRM-RS model to the provided dataset.
 }
 \examples{
 results <- fit_stan(df, stan_model = "stan/ARS_ERS.stan", theta_n = 2, 

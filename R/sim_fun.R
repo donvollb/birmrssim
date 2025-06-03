@@ -1,26 +1,77 @@
 #' Run Simulations in Parallel with Progress Reporting
 #'
-#' This function runs simulations in parallel based on the given simulation grid.
-#' It compiles Stan models, executes simulations using parallel workers, 
-#' handles warnings and errors, and saves results.
+#' This function runs simulations in parallel based on the specified simulation grid.
+#' It compiles Stan models, executes simulations across multiple workers, handles warnings and errors gracefully, and saves individual simulation results.
 #'
 #' @param sim_grid A data frame containing the grid of simulation parameters.
-#' @param results_path A file path to save individual simulation results.
-#' @param workers Number of parallel workers to use. Can be numeric, or "half"/"quarter".
+#' @param results_path File path to save individual simulation result files.
+#' @param workers Number of parallel workers to use. Can be a numeric value or one of "half" or "quarter" to specify relative to available cores.
 #' @param save_all Logical; whether to save all individual simulation result objects to disk.
+#' @param parallel_type Type of parallel processing to use. Default is "multisession".
 #'
-#' @return A data frame containing a summary of all simulations.
-#' Failed simulations are padded to match the structure of successful ones.
+#' @return A data frame summarizing all simulation results.
+#' Failed simulations are padded with appropriate placeholders to match the structure of successful simulations.
 #'
 #' @import cmdstanr
-#' @import posterior
 #' @import dplyr
-#' @import loo
 #' @import future
 #' @import future.apply
 #' @import progressr
 #'
+#' @examples
+#' # Define the simulation grid list
+#' sim_grid_list <- list(
+#'   n = 300,
+#'   theta_n = 2,
+#'   item_n1 = 6,
+#'   item_n2 = 6,
+#'   var_ers = c(0.5, 0.3),
+#'   var_ars = c(0.5, 0.3),
+#'   var_thetas1 = 1,
+#'   var_thetas2 = 1,
+#'   cor_ers1 = -0.1,
+#'   cor_ers2 = 0.1,
+#'   cor_thetas = 0.2,
+#'   ars_prior = 1,
+#'   x_num1 = c(0, 3),
+#'   x_num2 = c(0, 3),
+#'   chains = 2,
+#'   iter = 3000,
+#'   warmup = 2000,
+#'   adapt_delta = 0.8,
+#'   seed = NA,
+#'   stan_model = as.character("stan/ARS_ERS.stan"),
+#'   init_vals = FALSE,
+#'   replication = 1:10
+#' )
+#'
+#' # Create the simulation grid as a data frame
+#' sim_grid <- expand.grid(sim_grid_list)
+#'
+#' # Optional filtering steps
+#' sim_grid <- sim_grid[sim_grid$item_n1 == sim_grid$item_n2, ]
+#' sim_grid <- sim_grid[sim_grid$x_num1 == sim_grid$x_num2, ]
+#' sim_grid <- sim_grid[sim_grid$var_ers == sim_grid$var_ars, ]
+#'
+#' # Add index column and unique seeds
+#' sim_grid$index <- 1:nrow(sim_grid)
+#' sim_grid <- sim_grid[, c(ncol(sim_grid), 1:(ncol(sim_grid) - 1))]
+#' sim_grid$seed <- sample(1:1e7, size = nrow(sim_grid), replace = FALSE)
+#'
+#' # Run the simulation function with the grid and save results
+#' results_df <- run_simulations_parallel(
+#'   sim_grid = sim_grid,
+#'   results_path = "results",
+#'   parallel_type = "sequential"
+#' )
+#'
+#' # View the summary of simulation results
+#' print(results_df)
+#'
+#' 
+#' 
 #' @export
+
 sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, parallel_type = "multisession") {
 
   # half would mean two cores per replication, quarter would mean four
@@ -68,13 +119,13 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
       withCallingHandlers({
         do.call(one_simulation, args)
       }, warning = function(w) {
-        warnings_list <<- c(warnings_list, conditionMessage(w))
+        warnings_list <<- c(conditionMessage(w))
         message(sprintf("Warning during model fitting, index %s: ", row["index"]), 
                 conditionMessage(w))
         invokeRestart("muffleWarning")
       }),
       error = function(e) {
-        errors_list <<- c(errors_list, conditionMessage(e))
+        errors_list <<- c(conditionMessage(e))
         message(sprintf("Simulation failed, index %s: ", row["index"]), 
                 conditionMessage(e))
         return(list(summary = NA, warnings = NULL, error = conditionMessage(e)))
@@ -149,6 +200,8 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
   # add all the rows together for a dataframe
   results_df <- do.call(rbind, results_df)
   rownames(results_df) <- 1:nrow(results_df)
+
+  print(sessionInfo())
 
   return(results_df)
 }

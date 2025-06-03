@@ -1,19 +1,23 @@
-#' Generate a dataset
+#' Generate a dataset with the BIRM-RS
 #'
-#' Generates item and person parameters and then generates a datset with these parameters.
+#' Generates item and person parameters, then creates a dataset based on the BIRM-RS.
 #' @param n Number of observations.
-#' @param item_n Number of items. For multiple traits, this is a vector with the number of items per trait. When "auto", will be set to 10 for all traits.
-#' @param theta_n Number of latent traits (1 to 3).
-#' @param var_thetas variances of latent traits. Defaults to 1 for all traits.
-#' @param var_ers variance of ERS parameters. Defaults to 1.
-#' @param var_ars variance of ARS parameters. Defaults to 1.
-#' @param x_num number of reverse-coded items per theta. Defaults to floor(item_n/2).
-#' @param cor_thetas correlation between latent traits. When modeling three traits, the order of correlations is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4).
-#' @param cor_ers correlation between ERS and thetas. When modeling three traits, the order of correlations is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3).
-#' @details Generate item and person parameters and then generates a datset with these parameters.
-#' @return A list with two dataframes. One with the item parameters and one with the person parameters and simulated data.
-#' @import MASS
+#' @param item_n Number of items. For multiple traits, this can be a vector specifying the number of items per trait. When set to "auto" (default), it defaults to 10 items per trait.
+#' @param theta_n Number of latent traits (tested up to 3).
+#' @param var_thetas Variances of the latent traits. Defaults to 1 ("auto") for all traits.
+#' @param var_ers Variance of the ERS parameter. Defaults to 1.
+#' @param var_ars Variance of the ARS parameter. Defaults to 1.
+#' @param x_num Number of reverse-scored items per trait. Defaults to floor(item_n/2) ("auto").
+#' @param cor_thetas Correlations among latent traits. For three traits, the order is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4) ("auto").
+#' @param cor_ers Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3).
+#' @param include_ERS Logical; whether to include ERS in the model. Defaults to TRUE.
+#' @param include_ARS Logical; whether to include ARS in the model. Defaults to TRUE.
+#' @param seed Optional; seed for the random number generator.
+#' @details This function generates item and person parameters based on the BIRM-RS, and then simulates a dataset from these parameters.
+#' @return A list with two data frames: one containing item parameters, and the other containing person parameters and the simulated data.
+#' @importFrom MASS mvrnorm
 #' @examples
+
 #' dfs_list <- dgp_birm_rs(n = 2000, item_n = 10, theta_n = 1, var_thetas = rep(1, theta_n), var_ers = 1, var_ars = 1, x_num = floor(item_n/2), cor_ers = 0.2)
 #' @export
 

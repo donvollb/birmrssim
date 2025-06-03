@@ -1,16 +1,14 @@
 #' Summarize a fit object from \code{\link{fit_stan}}
 #'
-#' Summarizes a fit object by computing means, standard deviations, minima and maxima of the posterior distributions of the model parameters, and the root mean squared error of the model parameter estimates.
-#' @param fit fit-object from \code{\link{fit_stan}}
-#' @param df_list List containing the data used to fit the model and the items used to fit the model
-#' @param theta_n Number of latent traits
-#' @return A list with the summaries and the root mean squared errors
+#' Summarizes the results from a fit object, including means, standard deviations, minima, and maxima of the posterior distributions of the model parameters, as well as the root mean squared error (RMSE) of the model parameter estimates.
+#' @param fit Fit object from \code{\link{fit_stan}}.
+#' @param df_list List containing the data used to fit the model and the items used to fit the model.
+#' @param theta_n Number of latent traits. If not specified, it will be automatically inferred from the column names of \code{df_list$df}.
+#' @return A list containing summary statistics and the RMSEs of the model parameters.
 #' @import loo
-#' @importFrom magrittr %>%
 #' @import dplyr
-#' @import loo
-#' @import posterior
 #' @export
+
 
 summarize_fit <- function(fit, df_list, theta_n = "auto") {
 
@@ -19,7 +17,7 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
   items <- df_list$items
 
   # get the number of thetas if not specified
-  if (theta_n == "auto") grepl("theta", colnames(true)) %>% sum(.) -> theta_n
+  if (theta_n == "auto") grepl("theta", colnames(true)) |> sum(.) -> theta_n
 
   # Custom RMSE function
   rmse <- function(post_val, true_val) {
@@ -34,14 +32,14 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
   theta_estimates <- list()
   for (i in 1:theta_n) {
     var_name <- paste0("theta_", i)
-    theta_estimates[[var_name]] <- means[grepl(paste0("theta.*," , i, "]"), means$variable), "mean"] %>% unlist()
+    theta_estimates[[var_name]] <- means[grepl(paste0("theta.*," , i, "]"), means$variable), "mean"] |> unlist()
   }
 
   # ERS is the last column of theta
-  ers <- means[grepl(paste0("theta.*," , theta_n + 1, "]"), means$variable), "mean"] %>% unlist()
-  ars <- means[grepl("ars", means$variable), "mean"] %>% unlist()
-  delta <- means[grepl("delta", means$variable), "mean"] %>% unlist()
-  tau <- means[grepl("tau", means$variable), "mean"] %>% unlist()
+  ers <- means[grepl(paste0("theta.*," , theta_n + 1, "]"), means$variable), "mean"] |> unlist()
+  ars <- means[grepl("ars", means$variable), "mean"] |> unlist()
+  delta <- means[grepl("delta", means$variable), "mean"] |> unlist()
+  tau <- means[grepl("tau", means$variable), "mean"] |> unlist()
 
   # Start results list
   result <- data.frame(matrix(nrow = 1, ncol = 0))

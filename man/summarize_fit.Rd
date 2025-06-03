@@ -7,15 +7,15 @@
 summarize_fit(fit, df_list, theta_n = "auto")
 }
 \arguments{
-\item{fit}{fit-object from \code{\link{fit_stan}}}
+\item{fit}{Fit object from \code{\link{fit_stan}}.}
 
-\item{df_list}{List containing the data used to fit the model and the items used to fit the model}
+\item{df_list}{List containing the data used to fit the model and the items used to fit the model.}
 
-\item{theta_n}{Number of latent traits}
+\item{theta_n}{Number of latent traits. If not specified, it will be automatically inferred from the column names of \code{df_list$df}.}
 }
 \value{
-A list with the summaries and the root mean squared errors
+A list containing summary statistics and the RMSEs of the model parameters.
 }
 \description{
-Summarizes a fit object by computing means, standard deviations, minima and maxima of the posterior distributions of the model parameters, and the root mean squared error of the model parameter estimates.
+Summarizes the results from a fit object, including means, standard deviations, minima, and maxima of the posterior distributions of the model parameters, as well as the root mean squared error (RMSE) of the model parameter estimates.
 }

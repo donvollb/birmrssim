@@ -1,19 +1,21 @@
-#' Fit a RS-BIRM model
+#' Fit a BIRM-RS model
 #'
-#' Fits a RS-BIRM model to the data.
-#' @param data data frame with the data
-#' @param stan_model path to the stan model file
-#' @param theta_n number of latent traits
-#' @param x_vec vector of item codings
-#' @param T_vec vector of item numbers per trait
-#' @param iter number of iterations
-#' @param warmup number of warmup iterations
-#' @param chains number of chains
-#' @param seed random seed
-#' @param adapt_delta adaptation delta
-#' @param prefix Should only variables with the prefix be analyzed? Default is NULL
-#' @return a stanfit object
-#' @import cmdstanr 
+#' Fits a BIRM-RS model to the provided dataset.
+#' @param data Data frame containing the observed data.
+#' @param stan_model Path to the Stan model file.
+#' @param theta_n Number of latent traits.
+#' @param x_vec Vector indicating reverse-scored items (1 = normally scored, -1 = reverse-scored).
+#' @param T_vec Vector specifying the number of items per trait. Defaults to "auto", which sets it to the total number of items divided by theta_n.
+#' @param iter Number of iterations (excluding warmup).
+#' @param warmup Number of warmup iterations.
+#' @param chains Number of MCMC chains.
+#' @param seed Random seed for reproducibility.
+#' @param adapt_delta Target acceptance rate for step size adaptation in Stan. Defaults to 0.9.
+#' @param prefix Optional prefix indicating which variables to analyze. Default is "observed". If NULL, all columns are used.
+#' @param ars_prior Prior for the ARS parameter. Default is 0.9.
+#' @param init_vals Logical; indicates whether to use initial values. Default is FALSE.
+#' @return A stanfit object representing the fitted model.
+#' @import cmdstanr
 #' @examples
 #' results <- fit_stan(df, stan_model = "stan/ARS_ERS.stan", theta_n = 2, 
 #'                     x_vec = c(rep(1, 4), rep(-1, 4)), iter = 8000, warmup = 4000, chains = 6, 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/dgp_birm_rs.R
 \name{dgp_birm_rs}
 \alias{dgp_birm_rs}
-\title{Generate a dataset}
+\title{Generate a dataset with the BIRM-RS}
 \usage{
 dgp_birm_rs(
   n = 2000,
@@ -22,30 +22,36 @@ dgp_birm_rs(
 \arguments{
 \item{n}{Number of observations.}
 
-\item{item_n}{Number of items. For multiple traits, this is a vector with the number of items per trait. When "auto", will be set to 10 for all traits.}
+\item{item_n}{Number of items. For multiple traits, this can be a vector specifying the number of items per trait. When set to "auto" (default), it defaults to 10 items per trait.}
 
-\item{theta_n}{Number of latent traits (1 to 3).}
+\item{theta_n}{Number of latent traits (tested up to 3).}
 
-\item{var_thetas}{variances of latent traits. Defaults to 1 for all traits.}
+\item{var_thetas}{Variances of the latent traits. Defaults to 1 ("auto") for all traits.}
 
-\item{var_ers}{variance of ERS parameters. Defaults to 1.}
+\item{var_ers}{Variance of the ERS parameter. Defaults to 1.}
 
-\item{var_ars}{variance of ARS parameters. Defaults to 1.}
+\item{var_ars}{Variance of the ARS parameter. Defaults to 1.}
 
-\item{cor_thetas}{correlation between latent traits. When modeling three traits, the order of correlations is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4).}
+\item{cor_thetas}{Correlations among latent traits. For three traits, the order is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4) ("auto").}
 
-\item{x_num}{number of reverse-coded items per theta. Defaults to floor(item_n/2).}
+\item{x_num}{Number of reverse-scored items per trait. Defaults to floor(item_n/2) ("auto").}
 
-\item{cor_ers}{correlation between ERS and thetas. When modeling three traits, the order of correlations is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3).}
+\item{cor_ers}{Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3).}
+
+\item{include_ERS}{Logical; whether to include ERS in the model. Defaults to TRUE.}
+
+\item{include_ARS}{Logical; whether to include ARS in the model. Defaults to TRUE.}
+
+\item{seed}{Optional; seed for the random number generator.}
 }
 \value{
-A list with two dataframes. One with the item parameters and one with the person parameters and simulated data.
+A list with two data frames: one containing item parameters, and the other containing person parameters and the simulated data.
 }
 \description{
-Generates item and person parameters and then generates a datset with these parameters.
+Generates item and person parameters, then creates a dataset based on the BIRM-RS.
 }
 \details{
-Generate item and person parameters and then generates a datset with these parameters.
+This function generates item and person parameters based on the BIRM-RS, and then simulates a dataset from these parameters.
 }
 \examples{
 dfs_list <- dgp_birm_rs(n = 2000, item_n = 10, theta_n = 1, var_thetas = rep(1, theta_n), var_ers = 1, var_ars = 1, x_num = floor(item_n/2), cor_ers = 0.2)
