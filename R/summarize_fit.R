@@ -25,7 +25,7 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
   }
 
   # Extract relevant posterior means
-  means <- fit$summary(variables = c("theta", "ars", "delta", "tau")) |>
+  means <- fit$summary(variables = c("theta", "ars", "delta", "tau", "L_Sigma")) |>
     select(variable, mean)
 
   # Dynamically extract thetas
@@ -77,7 +77,7 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
   result$est_md_ars <- median(ars)
   result$est_rmse_ars <- rmse(ars, true$ars)
 
-  # Add correlations between person parameters
+  # Add correlations between person parameters (important: these are the correlations based on the posterior means)
   param_df <- data.frame(
     ers = ers,
     ars = ars
@@ -94,6 +94,14 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
       result[[paste0("est_cor_", name_i, "_", name_j)]] <- cor(param_df[[name_i]], param_df[[name_j]])
     }
   }
+
+  # now add the estimated variance-covariance matrix for theta_n and ERS
+  covs <- means[grepl("L_Sigma", means$variable), ]
+  covs_row <- t(covs$mean)
+  colnames(covs_row) <- covs$variable
+
+  # add it to result
+  result <- cbind(result, covs_row)
 
   # Add stats for item parameters
   result$est_cor_delta <- cor(delta, items$delta)

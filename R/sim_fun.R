@@ -201,7 +201,5 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
   results_df <- do.call(rbind, results_df)
   rownames(results_df) <- 1:nrow(results_df)
 
-  print(sessionInfo())
-
   return(results_df)
 }
