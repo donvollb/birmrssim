@@ -1,9 +1,9 @@
 Package: birmrssim
 Title: Simulation Tests for the Beta Item Response Model with Response Styles (BIRM-RS).
-Version: 1.0
+Version: 1.0.0
 Authors@R: 
-    person("Dominik", "Vollbracht", , "d.vollbracht", role = c("aut", "cre"))
-Maintainer: Dominik Vollbracht <d.vollbracht@rptu.de>
+    person("Anonym", "Anonym", , "a.nonym", role = c("aut", "cre"))
+Maintainer: Anonym Anonym <a.nonym@test.com>
 Description: This package evaluates parameter recovery in the Beta Item Response Model with Response Styles (BIRM-RS). It simulates data using the BIRM-RS, fits the model to the simulated data, and includes a wide range of customizable simulation conditions, such as sample size and number of items. 
 License: `use_gpl3_license()`
 Encoding: UTF-8

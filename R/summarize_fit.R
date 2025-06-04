@@ -96,6 +96,8 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
   }
 
   # now add the estimated variance-covariance matrix for theta_n and ERS
+  # the covariances in one diagonal block are 0 by default
+  # we do not remove them here to keep compability with different numbers of latent traits
   covs <- means[grepl("L_Sigma", means$variable), ]
   covs_row <- t(covs$mean)
   colnames(covs_row) <- covs$variable
