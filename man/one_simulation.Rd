@@ -35,10 +35,6 @@ one_simulation(...)
 
 \item{stan_model}{Path to the Stan model file (from \code{\link{fit_stan}}).}
 
-\item{x_vec}{Vector indicating reverse-scored items (from \code{\link{fit_stan}}).}
-
-\item{T_vec}{Vector of item numbers per trait; "auto" divides total items by theta_n (from \code{\link{fit_stan}}).}
-
 \item{iter}{Number of iterations excluding warmup (from \code{\link{fit_stan}}).}
 
 \item{warmup}{Number of warmup iterations (from \code{\link{fit_stan}}).}
@@ -47,14 +43,39 @@ one_simulation(...)
 
 \item{adapt_delta}{Target acceptance rate for adaptation (from \code{\link{fit_stan}}).}
 
-\item{prefix}{Prefix of variables to analyze; NULL uses all columns (from \code{\link{fit_stan}}).}
-
 \item{ars_prior}{Prior for ARS parameter (from \code{\link{fit_stan}}).}
 
 \item{init_vals}{Logical; whether to use initial values (from \code{\link{fit_stan}}).}
-
-\item{df_list}{List containing the data and items used to fit the model (from \code{\link{summarize_fit}}).}
+}
+\value{
+A named list containing:
+\describe{
+\item{summary}{Summary of simulation conditions, model fit and performance measures}
+\item{post_means}{Posterior means of parameters}
+\item{diagnostics}{MCMC diagnostics}
+\item{data}{The generated person parameters and simulated responses}
+\item{items}{The item parameters used in the simulation}
+}
 }
 \description{
 This function acts as a wrapper for \code{\link{dgp_birm_rs}}, \code{\link{fit_stan}}, and \code{\link{summarize_fit}}. It first simulates data based on the specified parameters, fits the BIRM-RS model to the data, and finally summarizes the fit, including posterior summaries and RMSEs.
+}
+\details{
+The arguments \code{x_vec}, \code{T_vec}, and \code{prefix} (passed to
+\code{\link{fit_stan}}) and \code{df_list} (passed to
+\code{\link{summarize_fit}}) are set automatically from the simulated data
+and cannot be supplied by the user.
+}
+\examples{
+\dontrun{
+result <- one_simulation(
+  n = 200, theta_n = 2, item_n = 10,
+  stan_model = "path/to/model.stan",
+  iter = 1000, warmup = 500, chains = 2
+)
+}
+
+}
+\seealso{
+\code{\link{dgp_birm_rs}}, \code{\link{fit_stan}}, \code{\link{summarize_fit}}
 }

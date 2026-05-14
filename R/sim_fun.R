@@ -1,16 +1,37 @@
 #' Run Simulations in Parallel with Progress Reporting
 #'
-#' This function runs simulations in parallel based on the specified simulation grid.
-#' It compiles Stan models, executes simulations across multiple workers, handles warnings and errors gracefully, and saves individual simulation results.
+#' This function runs simulations in parallel based on the specified simulation 
+#' grid. It compiles Stan models, executes simulations across multiple workers, 
+#' handles warnings and errors gracefully, and saves individual simulation results.
 #'
-#' @param sim_grid A data frame containing the grid of simulation parameters.
-#' @param results_path File path to save individual simulation result files.
-#' @param workers Number of parallel workers to use. Can be a numeric value or one of "half" or "quarter" to specify relative to available cores.
-#' @param save_all Logical; whether to save all individual simulation result objects to disk.
-#' @param parallel_type Type of parallel processing to use. Default is "multisession".
+#' @param sim_grid A data frame containing the grid of simulation parameters,
+#'   as created by \code{expand.grid()}. Each row represents one simulation 
+#'   condition. See examples for the expected structure.
+#' @param results_path File path to the directory where individual simulation 
+#'   result files are saved.
+#' @param workers Number of parallel workers. Either a numeric value or one of 
+#'   \code{"half"} or \code{"quarter"} to use half or a quarter of available cores.
+#'   Defaults to \code{"half"}.
+#' @param save_all Logical; whether to save each simulation result as an 
+#'   \code{.rda} file to \code{results_path}. Defaults to \code{TRUE}.
+#' @param parallel_type Type of parallel processing backend. One of 
+#'   \code{"multisession"} (default, works on all platforms), 
+#'   \code{"multicore"} (Unix/macOS only), or \code{"sequential"}.
 #'
-#' @return A data frame summarizing all simulation results.
-#' Failed simulations are padded with appropriate placeholders to match the structure of successful simulations.
+#' @details
+#' Stan models are compiled once in the parent process before parallelization
+#' to avoid redundant compilation across workers.
+#'
+#' Warnings generated during model fitting are caught and stored in the 
+#' \code{warnings} element of each simulation result. Errors cause the 
+#' simulation to fail gracefully, with the result padded with \code{NA} values
+#' to maintain a consistent structure in the returned data frame.
+#'
+#' Progress is reported via a text progress bar using the \pkg{progressr} package.
+#'
+#' @return A data frame summarizing all simulation results, with one row per 
+#'   simulation condition. Failed simulations are padded with \code{NA} values 
+#'   to match the structure of successful simulations.
 #'
 #' @import cmdstanr
 #' @import dplyr
@@ -19,7 +40,7 @@
 #' @import progressr
 #'
 #' @examples
-#' # Define the simulation grid list
+#' \dontrun{
 #' sim_grid_list <- list(
 #'   n = 300,
 #'   theta_n = 2,
@@ -45,30 +66,20 @@
 #'   replication = 1:10
 #' )
 #'
-#' # Create the simulation grid as a data frame
 #' sim_grid <- expand.grid(sim_grid_list)
-#'
-#' # Optional filtering steps
 #' sim_grid <- sim_grid[sim_grid$item_n1 == sim_grid$item_n2, ]
 #' sim_grid <- sim_grid[sim_grid$x_num1 == sim_grid$x_num2, ]
 #' sim_grid <- sim_grid[sim_grid$var_ers == sim_grid$var_ars, ]
-#'
-#' # Add index column and unique seeds
 #' sim_grid$index <- 1:nrow(sim_grid)
 #' sim_grid <- sim_grid[, c(ncol(sim_grid), 1:(ncol(sim_grid) - 1))]
 #' sim_grid$seed <- sample(1:1e7, size = nrow(sim_grid), replace = FALSE)
 #'
-#' # Run the simulation function with the grid and save results
-#' results_df <- run_simulations_parallel(
+#' results_df <- sim_fun(
 #'   sim_grid = sim_grid,
 #'   results_path = "results",
 #'   parallel_type = "sequential"
 #' )
-#'
-#' # View the summary of simulation results
-#' print(results_df)
-#'
-#' 
+#' }
 #' 
 #' @export
 

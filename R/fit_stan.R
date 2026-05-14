@@ -1,6 +1,7 @@
 #' Fit a BIRM-RS model
 #'
 #' Fits a BIRM-RS model to the provided dataset.
+#'
 #' @param data Data frame containing the observed data.
 #' @param stan_model Path to the Stan model file.
 #' @param theta_n Number of latent traits.
@@ -11,15 +12,41 @@
 #' @param chains Number of MCMC chains.
 #' @param seed Random seed for reproducibility.
 #' @param adapt_delta Target acceptance rate for step size adaptation in Stan. Defaults to 0.9.
-#' @param prefix Optional prefix indicating which variables to analyze. Default is "observed". If NULL, all columns are used.
+#' @param prefix Optional prefix indicating which variables to analyze. If NULL, all columns are used. Default is "observed".
 #' @param ars_prior Prior for the ARS parameter. Default is 0.9.
-#' @param init_vals Logical; indicates whether to use initial values. Default is FALSE.
-#' @return A stanfit object representing the fitted model.
+#' @param init_vals Logical; indicates whether to use initial values. Default is TRUE.
+#'
+#' @details
+#' Response values are clamped to the interval \[0.0001, 0.9999\] before fitting
+#' to avoid boundary issues, following the approach of Noel & Dauvier (2007).
+#' 
+#' #' The Stan model files included in this package can be accessed via
+#' \code{system.file()}. Available models are:
+#' \describe{
+#'   \item{BIRM_RS.stan}{Full model with ERS and ARS}
+#'   \item{ERS_only.stan}{Model with ERS only}
+#'   \item{ARS_only.stan}{Model with ARS only}
+#'   \item{no_RS.stan}{Model without response styles}
+#' }
+#' Example: \code{system.file("stan", "BIRM_RS.stan", package = "birmrssim")}
+#'
+#' If \code{init_vals = TRUE}, initial values are drawn randomly for all chain
+#' parameters to facilitate convergence.
+#'
+#' @return A \code{CmdStanMCMC} object (from \pkg{cmdstanr}) representing the fitted model.
+#' 
+#' @references
+#' Noel, Y., & Dauvier, B. (2007). A Beta Item Response Model for Continuous
+#' Bounded Responses. \emph{Applied Psychological Measurement}, \emph{31}(1),
+#' 47--73. \doi{10.1177/0146621605287691}
+#'
 #' @import cmdstanr
 #' @examples
-#' results <- fit_stan(df, stan_model = "stan/ARS_ERS.stan", theta_n = 2, 
-#'                     x_vec = c(rep(1, 4), rep(-1, 4)), iter = 8000, warmup = 4000, chains = 6, 
+#' \dontrun{
+#' results <- fit_stan(data, stan_model = "stan/ARS_ERS.stan", theta_n = 2,
+#'                     x_vec = c(rep(1, 4), rep(-1, 4)), iter = 8000, warmup = 4000, chains = 6,
 #'                     seed = sample(1:1e9, 1), adapt_delta = 0.9, prefix = "observed", init_vals = TRUE)
+#' }
 #' @export
 
 
@@ -30,7 +57,7 @@ fit_stan <- function(
 
   
   # if there is no prefix, use all columns
-  if (!is.null(prefix)) data_cols <- grepl(prefix, colnames(data))
+  if (!is.null(prefix)) {data_cols <- grepl(prefix, colnames(data))} else {data_cols <- rep(TRUE, ncol(data))}
   
   data <- data[, data_cols]
   

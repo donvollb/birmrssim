@@ -45,7 +45,12 @@ dgp_birm_rs(
 \item{seed}{Optional; seed for the random number generator.}
 }
 \value{
-A list with two data frames: one containing item parameters, and the other containing person parameters and the simulated data.
+A named list with two elements:
+\describe{
+\item{df}{A data frame containing person parameters (latent traits, ERS, ARS)
+and simulated item responses (prefixed with \code{observed_}).}
+\item{items}{A data frame containing item parameters (delta, tau, x).}
+}
 }
 \description{
 Generates item and person parameters, then creates a dataset based on the BIRM-RS.
@@ -54,5 +59,9 @@ Generates item and person parameters, then creates a dataset based on the BIRM-R
 This function generates item and person parameters based on the BIRM-RS, and then simulates a dataset from these parameters.
 }
 \examples{
-dfs_list <- dgp_birm_rs(n = 2000, item_n = 10, theta_n = 1, var_thetas = rep(1, theta_n), var_ers = 1, var_ars = 1, x_num = floor(item_n/2), cor_ers = 0.2)
+\dontrun{
+dfs_list <- dgp_birm_rs(n = 2000, item_n = 10, theta_n = 1,
+                         var_thetas = 1, var_ers = 1, var_ars = 1,
+                         x_num = 5, cor_ers = 0.2)
+}
 }

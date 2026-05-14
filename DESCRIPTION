@@ -1,14 +1,20 @@
 Package: birmrssim
-Title: Simulation Tests for the Beta Item Response Model with Response Styles (BIRM-RS).
-Version: 1.0.0
+Title: Simulation Tools for the Beta Item Response Model with Response Styles (BIRM-RS)
+Version: 0.1.0
 Authors@R: 
-    person("Anonym", "Anonym", , "a.nonym", role = c("aut", "cre"))
-Maintainer: Anonym Anonym <a.nonym@test.com>
-Description: This package evaluates parameter recovery in the Beta Item Response Model with Response Styles (BIRM-RS). It simulates data using the BIRM-RS, fits the model to the simulated data, and includes a wide range of customizable simulation conditions, such as sample size and number of items. 
-License: `use_gpl3_license()`
+    person("Dominik", "Vollbracht", , "d.vollbracht@rptu.de", role = c("aut", "cre"))
+Maintainer: Dominik Vollbracht <d.vollbracht@rptu.de>
+Description: Evaluates parameter recovery in the Beta Item Response Model 
+    with Response Styles (BIRM-RS). Provides functions to simulate data from 
+    the BIRM-RS, fit the model via Stan, and summarize parameter recovery across 
+    customizable simulation conditions (e.g., sample size, number of items, 
+    presence of ERS and ARS). Stan model files for four model variants (with 
+    and without ERS and ARS) are included and accessible via system.file().
+    An example simulation script is included and accessible via 
+    system.file("examples", "simulation_example.R", package = "birmrssim").
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
 Imports: 
     MASS,
     loo,    
@@ -17,3 +23,5 @@ Imports:
     progressr,
     future,
     future.apply
+Config/roxygen2/version: 8.0.0
+

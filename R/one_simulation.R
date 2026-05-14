@@ -16,19 +16,40 @@
 #' @param seed Random seed (used by all functions).
 #'
 #' @param stan_model Path to the Stan model file (from \code{\link{fit_stan}}).
-#' @param x_vec Vector indicating reverse-scored items (from \code{\link{fit_stan}}).
-#' @param T_vec Vector of item numbers per trait; "auto" divides total items by theta_n (from \code{\link{fit_stan}}).
 #' @param iter Number of iterations excluding warmup (from \code{\link{fit_stan}}).
 #' @param warmup Number of warmup iterations (from \code{\link{fit_stan}}).
 #' @param chains Number of MCMC chains (from \code{\link{fit_stan}}).
 #' @param adapt_delta Target acceptance rate for adaptation (from \code{\link{fit_stan}}).
-#' @param prefix Prefix of variables to analyze; NULL uses all columns (from \code{\link{fit_stan}}).
 #' @param ars_prior Prior for ARS parameter (from \code{\link{fit_stan}}).
 #' @param init_vals Logical; whether to use initial values (from \code{\link{fit_stan}}).
-#'
-#' @param df_list List containing the data and items used to fit the model (from \code{\link{summarize_fit}}).
 #' 
 #' @param ... Additional arguments passed to \code{\link{dgp_birm_rs}}, \code{\link{fit_stan}}, and \code{\link{summarize_fit}}.
+#' 
+#' @return A named list containing:
+#' \describe{
+#'   \item{summary}{Summary of simulation conditions, model fit and performance measures}
+#'   \item{post_means}{Posterior means of parameters}
+#'   \item{diagnostics}{MCMC diagnostics}
+#'   \item{data}{The generated person parameters and simulated responses}
+#'   \item{items}{The item parameters used in the simulation}
+#' }
+#' @details
+#' The arguments \code{x_vec}, \code{T_vec}, and \code{prefix} (passed to
+#' \code{\link{fit_stan}}) and \code{df_list} (passed to
+#' \code{\link{summarize_fit}}) are set automatically from the simulated data
+#' and cannot be supplied by the user.
+#' 
+#' @examples
+#' \dontrun{
+#' result <- one_simulation(
+#'   n = 200, theta_n = 2, item_n = 10,
+#'   stan_model = "path/to/model.stan",
+#'   iter = 1000, warmup = 500, chains = 2
+#' )
+#' }
+#' 
+#' @seealso \code{\link{dgp_birm_rs}}, \code{\link{fit_stan}}, \code{\link{summarize_fit}}
+#' 
 #' @export
 
 
@@ -37,7 +58,7 @@ one_simulation <- function(...){
   args <- list(...)
 
   # sort the arguments between the functions
-  dgp_birm_rs_args <- args[which(names(args) %in% c("n", "item_n", "theta_n", "var_thetas", "var_ers", "var_ars", "x_num", "cor_thetas", "cor_ers", "seed"))]
+  dgp_birm_rs_args <- args[which(names(args) %in% c("n", "item_n", "theta_n", "var_thetas", "var_ers", "var_ars", "x_num", "cor_thetas", "cor_ers", "seed", "include_ERS", "include_ARS"))]
   fit_stan_args <- args[which(names(args) %in% c("stan_model", "theta_n", "seed", "iter", "chains", "adapt_delta", "warmup", "ars_prior", "init_vals"))]
 
   # create the data

@@ -1,10 +1,37 @@
 #' Summarize a fit object from \code{\link{fit_stan}}
 #'
-#' Summarizes the results from a fit object, including means, standard deviations, minima, and maxima of the posterior distributions of the model parameters, as well as the root mean squared error (RMSE) of the model parameter estimates.
+#' Summarizes the results from a fit object, including means, standard deviations, 
+#' minima, and maxima of the posterior distributions of the model parameters, as 
+#' well as the root mean squared error (RMSE) of the model parameter estimates.
+#'
 #' @param fit Fit object from \code{\link{fit_stan}}.
-#' @param df_list List containing the data used to fit the model and the items used to fit the model.
-#' @param theta_n Number of latent traits. If not specified, it will be automatically inferred from the column names of \code{df_list$df}.
-#' @return A list containing summary statistics and the RMSEs of the model parameters.
+#' @param df_list List containing the data and item parameters used to fit the model,
+#'   as returned by \code{\link{dgp_birm_rs}}.
+#' @param theta_n Number of latent traits. If not specified, it will be automatically 
+#'   inferred from the column names of \code{df_list$df}.
+#'
+#' @details
+#' Performance measures (correlations, bias, RMSE) are computed by comparing 
+#' posterior means to the true values used in the data generating process. 
+#' Correlations between person parameters (ERS, ARS, latent traits) are based 
+#' on posterior means rather than full posterior distributions.
+#'
+#' Model fit is assessed via LOO-CV and WAIC using the \pkg{loo} package.
+#' The proportion of problematic Pareto-k values (k > 0.7) and problematic
+#' p_waic values (> 0.4) are also reported.
+#'
+#' @return A named list with three elements:
+#' \describe{
+#'   \item{summary}{A one-row data frame containing performance measures 
+#'   (correlations, bias, RMSE) for all person and item parameters, estimated 
+#'   correlations among person parameters, Cholesky factor elements of the 
+#'   covariance matrix, and model fit indices (LOO-CV, WAIC).}
+#'   \item{post_means}{A named list of posterior means for all person and item 
+#'   parameters (latent traits, ERS, ARS, delta, tau).}
+#'   \item{diagnostics}{A data frame containing Rhat, bulk ESS, and tail ESS 
+#'   for all model parameters.}
+#' }
+#'
 #' @import loo
 #' @import dplyr
 #' @export
