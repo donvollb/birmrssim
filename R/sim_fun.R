@@ -28,6 +28,12 @@
 #' to maintain a consistent structure in the returned data frame.
 #'
 #' Progress is reported via a text progress bar using the \pkg{progressr} package.
+#' 
+#' If \code{save_all = TRUE}, each simulation result is saved as an individual
+#' \code{.rda} file to \code{results_path}, named \code{results_<index>.rda}.
+#' Each file contains the full result object from \code{\link{one_simulation}},
+#' including posterior means, diagnostics, simulated data, item parameters, 
+#' and warnings.
 #'
 #' @return A data frame summarizing all simulation results, with one row per 
 #'   simulation condition. Failed simulations are padded with \code{NA} values 
