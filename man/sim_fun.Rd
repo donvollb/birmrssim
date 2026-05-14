@@ -51,6 +51,12 @@ simulation to fail gracefully, with the result padded with \code{NA} values
 to maintain a consistent structure in the returned data frame.
 
 Progress is reported via a text progress bar using the \pkg{progressr} package.
+
+If \code{save_all = TRUE}, each simulation result is saved as an individual
+\code{.rda} file to \code{results_path}, named \code{results_<index>.rda}.
+Each file contains the full result object from \code{\link{one_simulation}},
+including posterior means, diagnostics, simulated data, item parameters,
+and warnings.
 }
 \examples{
 \dontrun{
