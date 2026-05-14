@@ -1,5 +1,8 @@
 # birmrssim
 
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![R](https://img.shields.io/badge/R-%3E%3D4.0-276DC3)
+
 An R package for evaluating parameter recovery of the **Beta Item Response Model with Response Styles (BIRM-RS)**. The package provides functions to simulate data from the BIRM-RS, fit the model via Stan, and summarize parameter recovery across customizable simulation conditions. Stan model files for four model variants are included.
 
 This package was developed as a supplement to the following paper:
