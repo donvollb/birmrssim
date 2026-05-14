@@ -74,7 +74,7 @@ sim_grid$seed <- sample(1:1e7, size = nrow(sim_grid), replace = FALSE)
 # "multicore" on Linux/macOS only, or "sequential" for testing.
 results_df <- sim_fun(
   sim_grid      = sim_grid,
-  results_path  = "results",   # Directory to save individual result files
+  results_path  = "results",   # Directory to save individual result files, has to exist before running
   parallel_type = "sequential" # Change to "multisession" for parallel execution
 )
 
