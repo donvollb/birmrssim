@@ -11,7 +11,7 @@
 #' @param warmup Number of warmup iterations.
 #' @param chains Number of MCMC chains.
 #' @param seed Random seed for reproducibility.
-#' @param adapt_delta Target acceptance rate for step size adaptation in Stan. Defaults to 0.9.
+#' @param adapt_delta Target acceptance probability for step size adaptation in Stan. Defaults to 0.9.
 #' @param prefix Optional prefix indicating which variables to analyze. If NULL, all columns are used. Default is "observed".
 #' @param ars_prior Prior for the ARS parameter. Default is 0.9.
 #' @param init_vals Logical; indicates whether to use initial values. Default is TRUE.
@@ -20,7 +20,7 @@
 #' Response values are clamped to the interval \[0.0001, 0.9999\] before fitting
 #' to avoid boundary issues, following the approach of Noel & Dauvier (2007).
 #' 
-#' #' The Stan model files included in this package can be accessed via
+#' The Stan model files included in this package can be accessed via
 #' \code{system.file()}. Available models are:
 #' \describe{
 #'   \item{BIRM_RS.stan}{Full model with ERS and ARS}
@@ -43,7 +43,8 @@
 #' @import cmdstanr
 #' @examples
 #' \dontrun{
-#' results <- fit_stan(data, stan_model = "stan/ARS_ERS.stan", theta_n = 2,
+#' model_path <- system.file("stan", "BIRM_RS.stan", package = "birmrssim")
+#' results <- fit_stan(data, stan_model = model_path, theta_n = 2,
 #'                     x_vec = c(rep(1, 4), rep(-1, 4)), iter = 8000, warmup = 4000, chains = 6,
 #'                     seed = sample(1:1e9, 1), adapt_delta = 0.9, prefix = "observed", init_vals = TRUE)
 #' }
