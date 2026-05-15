@@ -107,6 +107,20 @@ The script demonstrates how to define a simulation grid, run simulations in para
 
 ---
 
+## Interactive Shiny App
+
+An interactive Shiny app illustrating the BIRM-RS model is available at:
+[https://donvollb.github.io/birm-rs_shiny/](https://donvollb.github.io/birm-rs_shiny/)
+
+The app visualizes how person parameters (latent trait, ERS, ARS) and item 
+parameters (difficulty, dispersion, item direction) affect the probability 
+density function of the model. It covers various model variants, from a standard 
+beta distribution to the full BIRM-RS, and includes a simulation tab for 
+exploring model behavior across a sample. The source code is available in 
+`inst/shiny/app.qmd`.
+
+---
+
 ## Citation
 
 If you use this package, please cite the associated paper:
