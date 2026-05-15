@@ -4,7 +4,13 @@
 \alias{summarize_fit}
 \title{Summarize a fit object from \code{\link{fit_stan}}}
 \usage{
-summarize_fit(fit, df_list, theta_n = "auto", include_ERS = TRUE, include_ARS = TRUE)
+summarize_fit(
+  fit,
+  df_list,
+  theta_n = "auto",
+  include_ERS = TRUE,
+  include_ARS = TRUE
+)
 }
 \arguments{
 \item{fit}{Fit object from \code{\link{fit_stan}}.}

@@ -75,11 +75,11 @@ and cannot be supplied by the user.
 The \code{include_ERS} and \code{include_ARS} flags must be consistent with
 the Stan model file supplied via \code{stan_model}. The correspondence is:
 \tabular{lll}{
-  \strong{Stan model}  \tab \strong{include_ERS} \tab \strong{include_ARS} \cr
-  \code{BIRM_RS.stan}  \tab \code{TRUE}          \tab \code{TRUE}          \cr
-  \code{ERS_only.stan} \tab \code{TRUE}           \tab \code{FALSE}         \cr
-  \code{ARS_only.stan} \tab \code{FALSE}          \tab \code{TRUE}          \cr
-  \code{no_RS.stan}    \tab \code{FALSE}          \tab \code{FALSE}         \cr
+\strong{Stan model}  \tab \strong{include_ERS} \tab \strong{include_ARS} \cr
+\code{BIRM_RS.stan}  \tab \code{TRUE}          \tab \code{TRUE}          \cr
+\code{ERS_only.stan} \tab \code{TRUE}           \tab \code{FALSE}         \cr
+\code{ARS_only.stan} \tab \code{FALSE}          \tab \code{TRUE}          \cr
+\code{no_RS.stan}    \tab \code{FALSE}          \tab \code{FALSE}         \cr
 }
 }
 \examples{
