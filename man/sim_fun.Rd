@@ -48,11 +48,11 @@ to avoid redundant compilation across workers.
 The \code{include_ERS} and \code{include_ARS} columns in \code{sim_grid}
 must be consistent with the \code{stan_model} column. The correspondence is:
 \tabular{lll}{
-  \strong{Stan model}  \tab \strong{include_ERS} \tab \strong{include_ARS} \cr
-  \code{BIRM_RS.stan}  \tab \code{TRUE}          \tab \code{TRUE}          \cr
-  \code{ERS_only.stan} \tab \code{TRUE}           \tab \code{FALSE}         \cr
-  \code{ARS_only.stan} \tab \code{FALSE}          \tab \code{TRUE}          \cr
-  \code{no_RS.stan}    \tab \code{FALSE}          \tab \code{FALSE}         \cr
+\strong{Stan model}  \tab \strong{include_ERS} \tab \strong{include_ARS} \cr
+\code{BIRM_RS.stan}  \tab \code{TRUE}          \tab \code{TRUE}          \cr
+\code{ERS_only.stan} \tab \code{TRUE}           \tab \code{FALSE}         \cr
+\code{ARS_only.stan} \tab \code{FALSE}          \tab \code{TRUE}          \cr
+\code{no_RS.stan}    \tab \code{FALSE}          \tab \code{FALSE}         \cr
 }
 If \code{include_ERS} or \code{include_ARS} are absent from \code{sim_grid},
 both default to \code{TRUE} (equivalent to \code{BIRM_RS.stan}).
