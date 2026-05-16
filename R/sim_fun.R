@@ -99,6 +99,9 @@
 
 sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, parallel_type = "multisession") {
 
+  # stop if results_path does not exist
+  if (!dir.exists(results_path)) stop("results_path does not exist: ", results_path)
+
   # half would mean two cores per replication, quarter would mean four
   if (workers == "half") workers <- future::availableCores() / 2 |> floor()
   if (workers == "quarter") workers <- future::availableCores() / 4 |> floor()
