@@ -164,7 +164,7 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
     results$summary <- c(row, results$summary) |> as.data.frame() 
 
     # if there are NAs (non-convergance), be sure it still works
-    if (any(is.na(results$summary))) results$summary <- t(results$summary) |> as.data.frame()
+    if (ncol(results$summary) == 1) results$summary <- t(results$summary) |> as.data.frame()
     
     # now save this row
     df_row <- results$summary 
