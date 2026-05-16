@@ -5,13 +5,11 @@
 #' @param item_n Number of items. For multiple traits, this can be a vector specifying the number of items per trait. When set to "auto" (default), it defaults to 10 items per trait.
 #' @param theta_n Number of latent traits (tested up to 3).
 #' @param var_thetas Variances of the latent traits. Defaults to 1 ("auto") for all traits.
-#' @param var_ers Variance of the ERS parameter. Defaults to 1.
-#' @param var_ars Variance of the ARS parameter. Defaults to 1.
+#' @param var_ers Variance of the ERS parameter. Defaults to 1. Set to 0 to exclude ERS from the data-generating process.
+#' @param var_ars Variance of the ARS parameter. Defaults to 1. Set to 0 to exclude ARS from the data-generating process.
 #' @param x_num Number of reverse-scored items per trait. Defaults to floor(item_n/2) ("auto").
 #' @param cor_thetas Correlations among latent traits. For three traits, the order is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4) ("auto").
-#' @param cor_ers Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3).
-#' @param include_ERS Logical; whether to include ERS in the model. Defaults to TRUE.
-#' @param include_ARS Logical; whether to include ARS in the model. Defaults to TRUE.
+#' @param cor_ers Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3). Ignored when \code{var_ers = 0}.
 #' @param seed Optional; seed for the random number generator.
 #' @details This function generates item and person parameters based on the BIRM-RS, and then simulates a dataset from these parameters.
 #' @return A named list with two elements:
@@ -31,12 +29,16 @@
 #' }
 #' @export
 
-dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1, 
+dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
   var_thetas = "auto", var_ers = 1, var_ars = 1, cor_thetas = "auto",
-  x_num = "auto", cor_ers = "auto", include_ERS = TRUE, include_ARS = TRUE, 
+  x_num = "auto", cor_ers = "auto",
   seed = sample(1:1e9, 1)) {
 
   set.seed(seed)
+
+  # derive include flags from variances (var = 0 means no RS)
+  include_ERS <- var_ers > 0
+  include_ARS <- var_ars > 0
 
   # simulate values if none were set
   if (item_n[1] == "auto") item_n <- rep(10, theta_n)
@@ -76,31 +78,32 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
     }
   }
   
-  # 2. Compute the covariance between each theta and ERS
-  # This creates a vector of covariances for each latent trait and ERS.
-  cov_ers_vec <- cor_ers * sqrt(var_ers) * sqrt(var_thetas)
-  
-  # 3. Build the full covariance matrix (Sigma) for theta and ERS.
-  # The matrix will be of dimension (theta_n + 1) x (theta_n + 1)
-  Sigma <- matrix(0, nrow = theta_n + 1, ncol = theta_n + 1)
-  Sigma[1:theta_n, 1:theta_n] <- CovTheta  # assign the latent traits covariance block
-  Sigma[theta_n + 1, theta_n + 1] <- var_ers  # assign the ERS variance
-  Sigma[1:theta_n, theta_n + 1] <- cov_ers_vec  # fill covariances between theta and ERS
-  Sigma[theta_n + 1, 1:theta_n] <- cov_ers_vec  # ensure symmetry
-
   # start the dataframe
-  df <- data.frame(
-    id = 1:n
-  )
+  df <- data.frame(id = 1:n)
 
-  # simulate latent traits and ERS from the covariance matrix
-  df[, c(paste0("theta", 1:theta_n), "ers")] <- MASS::mvrnorm(
-    n = n,
-    mu = rep(0, theta_n + 1),
-    Sigma = Sigma
-  )
+  if (include_ERS) {
+    # 2. Compute the covariance between each theta and ERS
+    cov_ers_vec <- cor_ers * sqrt(var_ers) * sqrt(var_thetas)
 
-  # simulate ARS
+    # 3. Build the full covariance matrix (theta_n + 1) x (theta_n + 1)
+    Sigma <- matrix(0, nrow = theta_n + 1, ncol = theta_n + 1)
+    Sigma[1:theta_n, 1:theta_n] <- CovTheta
+    Sigma[theta_n + 1, theta_n + 1] <- var_ers
+    Sigma[1:theta_n, theta_n + 1] <- cov_ers_vec
+    Sigma[theta_n + 1, 1:theta_n] <- cov_ers_vec
+
+    df[, c(paste0("theta", 1:theta_n), "ers")] <- MASS::mvrnorm(
+      n = n, mu = rep(0, theta_n + 1), Sigma = Sigma
+    )
+  } else {
+    # No ERS: simulate thetas only, set ERS to 0
+    df[, paste0("theta", 1:theta_n)] <- MASS::mvrnorm(
+      n = n, mu = rep(0, theta_n), Sigma = CovTheta
+    )
+    df$ers <- 0
+  }
+
+  # simulate ARS (var_ars = 0 yields all zeros)
   df$ars <- rnorm(n, 0, sqrt(var_ars))
 
 

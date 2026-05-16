@@ -17,21 +17,15 @@ one_simulation(...)
 
 \item{var_thetas}{Variances of latent traits (from \code{\link{dgp_birm_rs}}).}
 
-\item{var_ers}{Variance of ERS parameter (from \code{\link{dgp_birm_rs}}).}
+\item{var_ers}{Variance of ERS parameter (from \code{\link{dgp_birm_rs}}). Set to 0 to exclude ERS.}
 
-\item{var_ars}{Variance of ARS parameter (from \code{\link{dgp_birm_rs}}).}
+\item{var_ars}{Variance of ARS parameter (from \code{\link{dgp_birm_rs}}). Set to 0 to exclude ARS.}
 
 \item{x_num}{Number of reverse-scored items per trait (from \code{\link{dgp_birm_rs}}).}
 
 \item{cor_thetas}{Correlations between latent traits (from \code{\link{dgp_birm_rs}}).}
 
-\item{cor_ers}{Correlations between ERS and latent traits (from \code{\link{dgp_birm_rs}}).}
-
-\item{include_ERS}{Logical; whether to include ERS in the data-generating process
-(from \code{\link{dgp_birm_rs}}).}
-
-\item{include_ARS}{Logical; whether to include ARS in the data-generating process
-(from \code{\link{dgp_birm_rs}}).}
+\item{cor_ers}{Correlations between ERS and latent traits (from \code{\link{dgp_birm_rs}}). Ignored when \code{var_ers = 0}.}
 
 \item{seed}{Random seed (used by all functions).}
 
