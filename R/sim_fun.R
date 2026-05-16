@@ -22,23 +22,13 @@
 #' Stan models are compiled once in the parent process before parallelization
 #' to avoid redundant compilation across workers.
 #'
-#' The \code{include_ERS} and \code{include_ARS} columns in \code{sim_grid}
-#' must be consistent with the \code{stan_model} column. The correspondence is:
-#' \tabular{lll}{
-#'   \strong{Stan model}  \tab \strong{include_ERS} \tab \strong{include_ARS} \cr
-#'   \code{BIRM_RS.stan}  \tab \code{TRUE}          \tab \code{TRUE}          \cr
-#'   \code{ERS_only.stan} \tab \code{TRUE}           \tab \code{FALSE}         \cr
-#'   \code{ARS_only.stan} \tab \code{FALSE}          \tab \code{TRUE}          \cr
-#'   \code{no_RS.stan}    \tab \code{FALSE}          \tab \code{FALSE}         \cr
-#' }
-#' If \code{include_ERS} or \code{include_ARS} are absent from \code{sim_grid},
-#' both default to \code{TRUE} (equivalent to \code{BIRM_RS.stan}).
+#' Setting \code{var_ers = 0} or \code{var_ars = 0} in \code{sim_grid} excludes
+#' the corresponding response style from the data-generating process. The Stan
+#' model is selected independently via the \code{stan_model} column.
 #'
 #' For model comparison studies, run one \code{sim_fun} call per model variant
-#' (each with its own grid where \code{stan_model}, \code{include_ERS}, and
-#' \code{include_ARS} are fixed), then combine the results with
-#' \code{dplyr::bind_rows()}. This avoids invalid combinations of Stan model
-#' and RS flags that would arise from crossing all four variants in a single grid.
+#' (each with its own grid where \code{stan_model} is fixed), then combine the
+#' results with \code{dplyr::bind_rows()}.
 #'
 #' Warnings generated during model fitting are caught and stored in the 
 #' \code{warnings} element of each simulation result. Errors cause the 
@@ -145,9 +135,7 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
       warmup     = row["warmup"] |> as.numeric(),
       seed       = row["seed"] |> as.integer(),
       stan_model   = row["stan_model"] |> as.character(),
-      init_vals    = row["init_vals"] |> as.logical(),
-      include_ERS  = if ("include_ERS" %in% names(row)) row["include_ERS"] |> as.logical() else TRUE,
-      include_ARS  = if ("include_ARS" %in% names(row)) row["include_ARS"] |> as.logical() else TRUE
+      init_vals    = row["init_vals"] |> as.logical()
     )
 
     

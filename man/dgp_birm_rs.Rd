@@ -14,8 +14,6 @@ dgp_birm_rs(
   cor_thetas = "auto",
   x_num = "auto",
   cor_ers = "auto",
-  include_ERS = TRUE,
-  include_ARS = TRUE,
   seed = sample(1:1e+09, 1)
 )
 }
@@ -28,19 +26,15 @@ dgp_birm_rs(
 
 \item{var_thetas}{Variances of the latent traits. Defaults to 1 ("auto") for all traits.}
 
-\item{var_ers}{Variance of the ERS parameter. Defaults to 1.}
+\item{var_ers}{Variance of the ERS parameter. Defaults to 1. Set to 0 to exclude ERS from the data-generating process.}
 
-\item{var_ars}{Variance of the ARS parameter. Defaults to 1.}
+\item{var_ars}{Variance of the ARS parameter. Defaults to 1. Set to 0 to exclude ARS from the data-generating process.}
 
 \item{cor_thetas}{Correlations among latent traits. For three traits, the order is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4) ("auto").}
 
 \item{x_num}{Number of reverse-scored items per trait. Defaults to floor(item_n/2) ("auto").}
 
-\item{cor_ers}{Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3).}
-
-\item{include_ERS}{Logical; whether to include ERS in the model. Defaults to TRUE.}
-
-\item{include_ARS}{Logical; whether to include ARS in the model. Defaults to TRUE.}
+\item{cor_ers}{Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3). Ignored when \code{var_ers = 0}.}
 
 \item{seed}{Optional; seed for the random number generator.}
 }

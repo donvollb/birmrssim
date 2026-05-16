@@ -6,15 +6,11 @@
 #' @param item_n Number of items or vector of items per trait; "auto" defaults to 10 (from \code{\link{dgp_birm_rs}}).
 #' @param theta_n Number of latent traits (from \code{\link{dgp_birm_rs}} and \code{\link{fit_stan}}).
 #' @param var_thetas Variances of latent traits (from \code{\link{dgp_birm_rs}}).
-#' @param var_ers Variance of ERS parameter (from \code{\link{dgp_birm_rs}}).
-#' @param var_ars Variance of ARS parameter (from \code{\link{dgp_birm_rs}}).
+#' @param var_ers Variance of ERS parameter (from \code{\link{dgp_birm_rs}}). Set to 0 to exclude ERS.
+#' @param var_ars Variance of ARS parameter (from \code{\link{dgp_birm_rs}}). Set to 0 to exclude ARS.
 #' @param x_num Number of reverse-scored items per trait (from \code{\link{dgp_birm_rs}}).
 #' @param cor_thetas Correlations between latent traits (from \code{\link{dgp_birm_rs}}).
-#' @param cor_ers Correlations between ERS and latent traits (from \code{\link{dgp_birm_rs}}).
-#' @param include_ERS Logical; whether to include ERS in the data-generating process
-#'   (from \code{\link{dgp_birm_rs}}).
-#' @param include_ARS Logical; whether to include ARS in the data-generating process
-#'   (from \code{\link{dgp_birm_rs}}).
+#' @param cor_ers Correlations between ERS and latent traits (from \code{\link{dgp_birm_rs}}). Ignored when \code{var_ers = 0}.
 #' @param seed Random seed (used by all functions).
 #'
 #' @param stan_model Path to the Stan model file (from \code{\link{fit_stan}}).
@@ -61,7 +57,7 @@ one_simulation <- function(...){
   args <- list(...)
 
   # sort the arguments between the functions
-  dgp_birm_rs_args <- args[which(names(args) %in% c("n", "item_n", "theta_n", "var_thetas", "var_ers", "var_ars", "x_num", "cor_thetas", "cor_ers", "seed", "include_ERS", "include_ARS"))]
+  dgp_birm_rs_args <- args[which(names(args) %in% c("n", "item_n", "theta_n", "var_thetas", "var_ers", "var_ars", "x_num", "cor_thetas", "cor_ers", "seed"))]
   fit_stan_args <- args[which(names(args) %in% c("stan_model", "theta_n", "seed", "iter", "chains", "adapt_delta", "warmup", "ars_prior", "init_vals"))]
 
   # create the data
