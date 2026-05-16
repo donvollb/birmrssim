@@ -7,7 +7,7 @@
 one_simulation(...)
 }
 \arguments{
-\item{...}{Additional arguments passed to \code{\link{dgp_birm_rs}}, \code{\link{fit_stan}}, and \code{\link{summarize_fit}}.}
+\item{...}{Additional arguments passed to \code{\link{dgp_birm_rs}} and \code{\link{fit_stan}}.}
 
 \item{n}{Number of observations (from \code{\link{dgp_birm_rs}}).}
 
@@ -28,14 +28,10 @@ one_simulation(...)
 \item{cor_ers}{Correlations between ERS and latent traits (from \code{\link{dgp_birm_rs}}).}
 
 \item{include_ERS}{Logical; whether to include ERS in the data-generating process
-and model summary (from \code{\link{dgp_birm_rs}}). Must match the Stan model
-passed to \code{stan_model}: use \code{BIRM_RS.stan} or \code{ERS_only.stan}
-when \code{TRUE}, and \code{ARS_only.stan} or \code{no_RS.stan} when \code{FALSE}.}
+(from \code{\link{dgp_birm_rs}}).}
 
 \item{include_ARS}{Logical; whether to include ARS in the data-generating process
-and model summary (from \code{\link{dgp_birm_rs}}). Must match the Stan model
-passed to \code{stan_model}: use \code{BIRM_RS.stan} or \code{ARS_only.stan}
-when \code{TRUE}, and \code{ERS_only.stan} or \code{no_RS.stan} when \code{FALSE}.}
+(from \code{\link{dgp_birm_rs}}).}
 
 \item{seed}{Random seed (used by all functions).}
 
@@ -71,16 +67,6 @@ The arguments \code{x_vec}, \code{T_vec}, and \code{prefix} (passed to
 \code{\link{fit_stan}}) and \code{df_list} (passed to
 \code{\link{summarize_fit}}) are set automatically from the simulated data
 and cannot be supplied by the user.
-
-The \code{include_ERS} and \code{include_ARS} flags must be consistent with
-the Stan model file supplied via \code{stan_model}. The correspondence is:
-\tabular{lll}{
-  \strong{Stan model}  \tab \strong{include_ERS} \tab \strong{include_ARS} \cr
-  \code{BIRM_RS.stan}  \tab \code{TRUE}          \tab \code{TRUE}          \cr
-  \code{ERS_only.stan} \tab \code{TRUE}           \tab \code{FALSE}         \cr
-  \code{ARS_only.stan} \tab \code{FALSE}          \tab \code{TRUE}          \cr
-  \code{no_RS.stan}    \tab \code{FALSE}          \tab \code{FALSE}         \cr
-}
 }
 \examples{
 \dontrun{

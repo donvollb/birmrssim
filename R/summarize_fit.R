@@ -9,14 +9,16 @@
 #'   as returned by \code{\link{dgp_birm_rs}}.
 #' @param theta_n Number of latent traits. If not specified, it will be automatically
 #'   inferred from the column names of \code{df_list$df}.
-#' @param include_ERS Logical; whether the fitted model includes ERS. Defaults to TRUE.
-#'   If FALSE, all ERS-related columns in the summary are set to \code{NA}, and the
-#'   ERS dimension of the Cholesky factor (\code{L_Sigma}) is padded with \code{NA}
-#'   to preserve a consistent output structure across model variants.
-#' @param include_ARS Logical; whether the fitted model includes ARS. Defaults to TRUE.
-#'   If FALSE, all ARS-related columns in the summary are set to \code{NA}.
-#'
 #' @details
+#' The presence of ERS and ARS is detected automatically from the variable names
+#' in the fitted model: ERS is assumed present when \code{theta} has
+#' \code{theta_n + 1} columns (last column = ERS), and ARS is assumed present
+#' when an \code{ars} parameter exists. Columns for absent RS parameters are
+#' set to \code{NA}, and the \code{L_Sigma} block is always output as a
+#' \code{(theta_n+1) x (theta_n+1)} matrix (ERS row/column padded with \code{NA}
+#' when ERS is absent). This keeps the output structure identical across all four
+#' model variants so that results can be combined with \code{dplyr::bind_rows()}.
+#'
 #' Performance measures (correlations, bias, RMSE) are computed by comparing
 #' posterior means to the true values used in the data generating process.
 #' Correlations between person parameters (ERS, ARS, latent traits) are based
@@ -26,11 +28,6 @@
 #' The proportion of problematic Pareto-k values (k > 0.7) and problematic
 #' p_waic values (> 0.4) are also reported.
 #'
-#' The output structure (column names and order of the \code{summary} data frame)
-#' is identical across all four model variants so that results can be combined
-#' with \code{dplyr::bind_rows()} or \code{rbind()}. Columns that are not
-#' applicable for a given variant contain \code{NA}.
-#'
 #' @return A named list with three elements:
 #' \describe{
 #'   \item{summary}{A one-row data frame containing performance measures
@@ -38,8 +35,8 @@
 #'   correlations among person parameters, Cholesky factor elements of the
 #'   covariance matrix, and model fit indices (LOO-CV, WAIC).}
 #'   \item{post_means}{A named list of posterior means for all person and item
-#'   parameters (latent traits, ERS, ARS, delta, tau). ERS and ARS are omitted
-#'   when \code{include_ERS} or \code{include_ARS} is \code{FALSE}.}
+#'   parameters (latent traits, delta, tau, and ERS/ARS when present in the
+#'   fitted model).}
 #'   \item{diagnostics}{A data frame containing Rhat, bulk ESS, and tail ESS
 #'   for all model parameters.}
 #' }
@@ -49,7 +46,7 @@
 #' @export
 
 
-summarize_fit <- function(fit, df_list, theta_n = "auto", include_ERS = TRUE, include_ARS = TRUE) {
+summarize_fit <- function(fit, df_list, theta_n = "auto") {
 
   # get true values
   true <- df_list$df
@@ -57,6 +54,11 @@ summarize_fit <- function(fit, df_list, theta_n = "auto", include_ERS = TRUE, in
 
   # get the number of thetas if not specified
   if (theta_n == "auto") grepl("theta", colnames(true)) |> sum() -> theta_n
+
+  # Auto-detect which RS parameters are present in the fitted model
+  all_vars <- dimnames(fit$draws())[[3]]
+  include_ARS <- any(grepl("^ars\\[", all_vars))
+  include_ERS <- any(grepl(paste0("^theta\\[.*,", theta_n + 1, "\\]"), all_vars))
 
   # Custom RMSE function
   rmse <- function(post_val, true_val) {

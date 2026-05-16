@@ -12,13 +12,9 @@
 #' @param cor_thetas Correlations between latent traits (from \code{\link{dgp_birm_rs}}).
 #' @param cor_ers Correlations between ERS and latent traits (from \code{\link{dgp_birm_rs}}).
 #' @param include_ERS Logical; whether to include ERS in the data-generating process
-#'   and model summary (from \code{\link{dgp_birm_rs}}). Must match the Stan model
-#'   passed to \code{stan_model}: use \code{BIRM_RS.stan} or \code{ERS_only.stan}
-#'   when \code{TRUE}, and \code{ARS_only.stan} or \code{no_RS.stan} when \code{FALSE}.
+#'   (from \code{\link{dgp_birm_rs}}).
 #' @param include_ARS Logical; whether to include ARS in the data-generating process
-#'   and model summary (from \code{\link{dgp_birm_rs}}). Must match the Stan model
-#'   passed to \code{stan_model}: use \code{BIRM_RS.stan} or \code{ARS_only.stan}
-#'   when \code{TRUE}, and \code{ERS_only.stan} or \code{no_RS.stan} when \code{FALSE}.
+#'   (from \code{\link{dgp_birm_rs}}).
 #' @param seed Random seed (used by all functions).
 #'
 #' @param stan_model Path to the Stan model file (from \code{\link{fit_stan}}).
@@ -29,7 +25,7 @@
 #' @param ars_prior Prior for ARS parameter (from \code{\link{fit_stan}}).
 #' @param init_vals Logical; whether to use initial values (from \code{\link{fit_stan}}).
 #' 
-#' @param ... Additional arguments passed to \code{\link{dgp_birm_rs}}, \code{\link{fit_stan}}, and \code{\link{summarize_fit}}.
+#' @param ... Additional arguments passed to \code{\link{dgp_birm_rs}} and \code{\link{fit_stan}}.
 #' 
 #' @return A named list containing:
 #' \describe{
@@ -45,16 +41,7 @@
 #' \code{\link{summarize_fit}}) are set automatically from the simulated data
 #' and cannot be supplied by the user.
 #'
-#' The \code{include_ERS} and \code{include_ARS} flags must be consistent with
-#' the Stan model file supplied via \code{stan_model}. The correspondence is:
-#' \tabular{lll}{
-#'   \strong{Stan model}  \tab \strong{include_ERS} \tab \strong{include_ARS} \cr
-#'   \code{BIRM_RS.stan}  \tab \code{TRUE}          \tab \code{TRUE}          \cr
-#'   \code{ERS_only.stan} \tab \code{TRUE}           \tab \code{FALSE}         \cr
-#'   \code{ARS_only.stan} \tab \code{FALSE}          \tab \code{TRUE}          \cr
-#'   \code{no_RS.stan}    \tab \code{FALSE}          \tab \code{FALSE}         \cr
-#' }
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' result <- one_simulation(
@@ -94,9 +81,7 @@ one_simulation <- function(...){
   fit <- do.call(fit_stan, fit_stan_args)
 
   # summarize the model
-  include_ERS <- if (!is.null(args$include_ERS)) args$include_ERS else TRUE
-  include_ARS <- if (!is.null(args$include_ARS)) args$include_ARS else TRUE
-  results <- summarize_fit(fit, data_list, include_ERS = include_ERS, include_ARS = include_ARS)
+  results <- summarize_fit(fit, data_list)
   rm(fit)
 
   # add the data and items to the results object (list)
