@@ -55,7 +55,7 @@ summarize_fit <- function(fit, df_list, theta_n = "auto") {
   # get the number of thetas if not specified
   if (theta_n == "auto") grepl("theta", colnames(true)) |> sum() -> theta_n
 
-  # Auto-detect which RS parameters are present in the fitted model
+  # Auto-detect whether ERS and ARS are present in the fitted model
   all_vars <- dimnames(fit$draws())[[3]]
   include_ARS <- any(grepl("^ars\\[", all_vars))
   include_ERS <- any(grepl(paste0("^theta\\[.*,", theta_n + 1, "\\]"), all_vars))

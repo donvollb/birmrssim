@@ -12,6 +12,9 @@ Description: Evaluates parameter recovery in the Beta Item Response Model
     and without ERS and ARS) are included and accessible via system.file().
     An example simulation script is included and accessible via 
     system.file("examples", "sim_example.R", package = "birmrssim").
+    An interactive Shiny app illustrating the model is available at
+    <https://donvollb.github.io/birm-rs_shiny/>. An example simulation script
+    is included and accessible via system.file().
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -23,6 +26,5 @@ Imports:
     progressr,
     future,
     future.apply
-RoxygenNote: 7.3.2
 Config/roxygen2/version: 8.0.0
 
