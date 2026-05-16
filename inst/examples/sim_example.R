@@ -54,9 +54,6 @@ conditions_list <- list(
 sim_grid <- expand.grid(conditions_list)
 sim_grid$stan_model <- as.character(sim_grid$stan_model)
 
-# Remove conditions where var_ers != var_ars
-sim_grid <- sim_grid[sim_grid$var_ers == sim_grid$var_ars, ]
-
 # Add condition and index columns
 sim_grid$condition <- rep(1:(nrow(sim_grid) / length(conditions_list$replication)),
                           each = length(conditions_list$replication))
