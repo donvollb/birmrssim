@@ -5,8 +5,8 @@
 #' @param item_n Number of items. For multiple traits, this can be a vector specifying the number of items per trait. When set to "auto" (default), it defaults to 10 items per trait.
 #' @param theta_n Number of latent traits (tested up to 3).
 #' @param var_thetas Variances of the latent traits. Defaults to 1 ("auto") for all traits.
-#' @param var_ers Variance of the ERS parameter. Defaults to 1. Set to 0 to exclude ERS from the data-generating process.
-#' @param var_ars Variance of the ARS parameter. Defaults to 1. Set to 0 to exclude ARS from the data-generating process.
+#' @param var_ers Variance of the ERS parameter. Defaults to 0.3. Set to 0 to exclude ERS from the data-generating process.
+#' @param var_ars Variance of the ARS parameter. Defaults to 0.3. Set to 0 to exclude ARS from the data-generating process.
 #' @param x_num Number of reverse-scored items per trait. Defaults to floor(item_n/2) ("auto").
 #' @param cor_thetas Correlations among latent traits. For three traits, the order is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4) ("auto").
 #' @param cor_ers Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3). Ignored when \code{var_ers = 0}.
@@ -24,13 +24,13 @@
 #' @examples
 #' \dontrun{
 #' dfs_list <- dgp_birm_rs(n = 2000, item_n = 10, theta_n = 1,
-#'                          var_thetas = 1, var_ers = 1, var_ars = 1,
+#'                          var_thetas = 1, var_ers = 0.3, var_ars = 0.3,
 #'                          x_num = 5, cor_ers = 0.2)
 #' }
 #' @export
 
 dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
-  var_thetas = "auto", var_ers = 1, var_ars = 1, cor_thetas = "auto",
+  var_thetas = "auto", var_ers = 0.3, var_ars = 0.3, cor_thetas = "auto",
   x_num = "auto", cor_ers = "auto",
   seed = sample(1:1e9, 1)) {
 
