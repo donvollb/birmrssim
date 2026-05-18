@@ -9,8 +9,8 @@ dgp_birm_rs(
   item_n = "auto",
   theta_n = 1,
   var_thetas = "auto",
-  var_ers = 1,
-  var_ars = 1,
+  var_ers = 0.3,
+  var_ars = 0.3,
   cor_thetas = "auto",
   x_num = "auto",
   cor_ers = "auto",
@@ -26,9 +26,9 @@ dgp_birm_rs(
 
 \item{var_thetas}{Variances of the latent traits. Defaults to 1 ("auto") for all traits.}
 
-\item{var_ers}{Variance of the ERS parameter. Defaults to 1. Set to 0 to exclude ERS from the data-generating process.}
+\item{var_ers}{Variance of the ERS parameter. Defaults to 0.3. Set to 0 to exclude ERS from the data-generating process.}
 
-\item{var_ars}{Variance of the ARS parameter. Defaults to 1. Set to 0 to exclude ARS from the data-generating process.}
+\item{var_ars}{Variance of the ARS parameter. Defaults to 0.3. Set to 0 to exclude ARS from the data-generating process.}
 
 \item{cor_thetas}{Correlations among latent traits. For three traits, the order is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4) ("auto").}
 
@@ -55,7 +55,7 @@ This function generates item and person parameters based on the BIRM-RS, and the
 \examples{
 \dontrun{
 dfs_list <- dgp_birm_rs(n = 2000, item_n = 10, theta_n = 1,
-                         var_thetas = 1, var_ers = 1, var_ars = 1,
+                         var_thetas = 1, var_ers = 0.3, var_ars = 0.3,
                          x_num = 5, cor_ers = 0.2)
 }
 }

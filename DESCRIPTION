@@ -10,11 +10,10 @@ Description: Evaluates parameter recovery in the Beta Item Response Model
     customizable simulation conditions (e.g., sample size, number of items, 
     presence of ERS and ARS). Stan model files for four model variants (with 
     and without ERS and ARS) are included and accessible via system.file().
-    An example simulation script is included and accessible via 
+    An example simulation script is included and accessible via
     system.file("examples", "sim_example.R", package = "birmrssim").
     An interactive Shiny app illustrating the model is available at
-    <https://donvollb.github.io/birm-rs_shiny/>. An example simulation script
-    is included and accessible via system.file().
+    <https://donvollb.github.io/birm-rs_shiny/>.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

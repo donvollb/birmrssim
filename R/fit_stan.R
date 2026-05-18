@@ -68,13 +68,9 @@ fit_stan <- function(
   
   
 
-    # data[data > 1 - 1e-10] <- 1 - 1e-10
-    # data[data < 1e-10] <- 1e-10
-    data[data > .9999] <- 0.9999
-    data[data < .0001] <- 0.0001
+  data[data > .9999] <- 0.9999
+  data[data < .0001] <- 0.0001
   # see paper from Noel & Dauvier
-  
-
 
   n <- nrow(data)
 
@@ -85,28 +81,31 @@ fit_stan <- function(
   set.seed(seed)
 
   # load the model (and compile if necessary)
-  stan_model <- cmdstan_model(
-    stan_model
-  )
+  stan_model_path <- stan_model
+  stan_model <- cmdstan_model(stan_model_path)
 
-
-
-  # inital values (if relevant)
+  # initial values (if relevant)
   if (init_vals == TRUE) {
 
+    # detect ARS from compiled model parameter names
+    has_ars <- "ars" %in% names(stan_model$variables()$parameters)
+    # detect ERS from Stan source (ERS models use theta_n + 1 as theta dimension)
+    has_ers    <- any(grepl("theta_n\\s*\\+\\s*1", readLines(stan_model_path, warn = FALSE)))
+    theta_cols <- if (has_ers) theta_n + 1 else theta_n
+
     common_inits <- list(
-      theta = matrix(rnorm(n * (theta_n + 1), 0, 1), nrow = n, ncol = theta_n + 1),  # Random initialization
-      ars = rnorm(n, 0, 1),  # Random initialization for ars
-      delta = rnorm(ncol(data), 0, 5),  # Random initialization for delta
-      tau = rep(1.5, ncol(data)),  # A reasonable starting value for tau
-      sigma = rep(1, theta_n + 1),  # A reasonable starting value for sigma
-      Sigma_corr = diag(theta_n + 1)  # Start with identity correlation matrix
-      )
-    
+      theta      = matrix(rnorm(n * theta_cols, 0, 1), nrow = n, ncol = theta_cols),
+      delta      = rnorm(ncol(data), 0, 5),
+      tau        = rep(1.5, ncol(data)),
+      sigma      = rep(1, theta_cols),
+      Sigma_corr = diag(theta_cols)
+    )
+    if (has_ars) common_inits$ars <- rnorm(n, 0, 1)
+
     init <- rep(list(common_inits), chains)
 
   } else {
-    init = NULL
+    init <- NULL
   }
 
 

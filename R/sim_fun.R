@@ -110,10 +110,6 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
   warnings_list <- list()
   errors_list <- list()
 
-  # important if there are multiple models
-  # we want to compile them only once
-  stan_model_files <- unique(sim_grid$stan_model) |> as.character()
-
   # Compile all models once in the parent process
   model_files <- unique(sim_grid$stan_model) |> as.character()
   invisible(lapply(model_files, cmdstanr::cmdstan_model))
