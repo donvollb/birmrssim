@@ -1,6 +1,6 @@
 Package: birmrssim
 Title: Simulation Tools for the Beta Item Response Model with Response Styles (BIRM-RS)
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person("Dominik", "Vollbracht", , "d.vollbracht@rptu.de", role = c("aut", "cre"),
     comment = c(ORCID = "0000-0003-1040-7851"))
