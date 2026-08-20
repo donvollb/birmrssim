@@ -69,7 +69,8 @@ one_simulation <- function(...){
   # add a few arguments based on the data
   fit_stan_args$data <- data
   fit_stan_args$x_vec <- items$x
-  fit_stan_args$T_vec <- args$item_n
+  # item_n may be absent (dgp_birm_rs then uses its own default), so fall back to "auto"
+  fit_stan_args$T_vec <- if (is.null(args$item_n)) "auto" else args$item_n
   fit_stan_args$prefix <- "observed"
 
 

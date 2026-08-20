@@ -40,12 +40,16 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
   include_ERS <- var_ers > 0
   include_ARS <- var_ars > 0
 
+
+  # "auto" check that also copes with empty arguments (e.g. cor_thetas for a single trait)
+  is_auto <- function(x) is.character(x) && length(x) > 0 && x[1] == "auto"
+
   # simulate values if none were set
-  if (item_n[1] == "auto") item_n <- rep(10, theta_n)
-  if (var_thetas[1] == "auto") var_thetas <- rep(1, theta_n)
-  if (cor_thetas[1] == "auto") cor_thetas <- runif((theta_n*(theta_n - 1))/2, -0.4, 0.4)
-  if (x_num[1] == "auto") x_num <- floor(item_n/2)
-  if (cor_ers[1] == "auto") cor_ers <- runif(theta_n, -0.3, 0.3)
+  if (is_auto(item_n)) item_n <- rep(10, theta_n)
+  if (is_auto(var_thetas)) var_thetas <- rep(1, theta_n)
+  if (is_auto(cor_thetas)) cor_thetas <- runif((theta_n*(theta_n - 1))/2, -0.4, 0.4)
+  if (is_auto(x_num)) x_num <- floor(item_n/2)
+  if (is_auto(cor_ers)) cor_ers <- runif(theta_n, -0.3, 0.3)
   # df <- data.frame(id = 1:n)
 
   # check if length(item_n) is equal to theta_n
@@ -67,14 +71,16 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
 
 
   # 1. Create the covariance matrix for the latent traits (theta)
-  CovTheta <- diag(var_thetas)  # Start with a diagonal matrix using the variances
-  counter <- 1
-  for (i in 1:(theta_n - 1)) {
-    for (j in (i + 1):theta_n) {
-      # Fill the off-diagonals with the appropriate covariance computed from cor_thetas
-      CovTheta[i, j] <- cor_thetas[counter] * sqrt(var_thetas[i] * var_thetas[j])
-      CovTheta[j, i] <- CovTheta[i, j]  # ensure symmetry
-      counter <- counter + 1
+  CovTheta <- diag(var_thetas, nrow = theta_n)  # Start with a diagonal matrix using the variances
+  if (theta_n > 1) {
+    counter <- 1
+    for (i in 1:(theta_n - 1)) {
+      for (j in (i + 1):theta_n) {
+        # Fill the off-diagonals with the appropriate covariance computed from cor_thetas
+        CovTheta[i, j] <- cor_thetas[counter] * sqrt(var_thetas[i] * var_thetas[j])
+        CovTheta[j, i] <- CovTheta[i, j]  # ensure symmetry
+        counter <- counter + 1
+      }
     }
   }
   
