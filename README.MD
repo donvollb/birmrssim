@@ -8,7 +8,7 @@ An R package for evaluating parameter recovery of the **Beta Item Response Model
 
 This package was developed as a supplement to the following paper:
 
-> *Citation will be added upon publication.*
+> Vollbracht, D., Lischetzke, T., & Henninger, M. (2026). *Detecting response styles in visual analogue scales* [Preprint]. PsyArXiv. https://doi.org/10.31234/osf.io/xteku_v1
 
 ---
 
@@ -126,7 +126,9 @@ exploring model behavior across a sample. The source code is available in
 
 If you use this package, please cite the associated paper:
 
-> *Citation will be added upon publication.*
+> Vollbracht, D., Lischetzke, T., & Henninger, M. (2026). *Detecting response styles in visual analogue scales* [Preprint]. PsyArXiv. https://doi.org/10.31234/osf.io/xteku_v1
+
+The package itself can be cited via its Zenodo DOI: [10.5281/zenodo.20305322](https://doi.org/10.5281/zenodo.20305322) (always resolves to the latest version).
 
 ---
 

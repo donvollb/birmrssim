@@ -1,0 +1,51 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated paper (preferred-citation) and the software itself."
+type: software
+title: "birmrssim: Simulation Tools for the Beta Item Response Model with Response Styles (BIRM-RS)"
+version: 0.1.1
+doi: 10.5281/zenodo.20305322
+license: GPL-3.0-or-later
+repository-code: "https://github.com/donvollb/birmrssim"
+abstract: >-
+  Evaluates parameter recovery in the Beta Item Response Model with Response
+  Styles (BIRM-RS). Provides functions to simulate data from the BIRM-RS, fit
+  the model via Stan, and summarize parameter recovery across customizable
+  simulation conditions (e.g., sample size, number of items, presence of ERS
+  and ARS). Stan model files for four model variants (with and without ERS and
+  ARS) are included.
+keywords:
+  - item response theory
+  - beta item response model
+  - response styles
+  - visual analogue scales
+  - simulation
+  - Stan
+  - R
+authors:
+  - family-names: Vollbracht
+    given-names: Dominik
+    email: d.vollbracht@rptu.de
+    affiliation: RPTU University Kaiserslautern-Landau
+    orcid: "https://orcid.org/0000-0003-1040-7851"
+preferred-citation:
+  type: article
+  status: preprint
+  title: "Detecting Response Styles in Visual Analogue Scales"
+  authors:
+    - family-names: Vollbracht
+      given-names: Dominik
+      affiliation: RPTU University Kaiserslautern-Landau
+      orcid: "https://orcid.org/0000-0003-1040-7851"
+    - family-names: Lischetzke
+      given-names: Tanja
+      affiliation: RPTU University Kaiserslautern-Landau
+      orcid: "https://orcid.org/0000-0002-4326-5127"
+    - family-names: Henninger
+      given-names: Mirka
+      affiliation: University of Basel
+      orcid: "https://orcid.org/0000-0003-4676-2361"
+  journal: PsyArXiv
+  year: 2026
+  month: 5
+  doi: 10.31234/osf.io/xteku_v1
+  url: "https://doi.org/10.31234/osf.io/xteku_v1"
