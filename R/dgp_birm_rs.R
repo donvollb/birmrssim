@@ -9,17 +9,23 @@
 #' @param var_ars Variance of the ARS parameter. Defaults to 0.3. Set to 0 to exclude ARS from the data-generating process.
 #' @param x_num Number of reverse-scored items per trait. Defaults to floor(item_n/2) ("auto").
 #' @param cor_thetas Correlations among latent traits. For three traits, the order is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4) ("auto").
-#' @param cor_ers Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3). Ignored when \code{var_ers = 0}.
+#' @param cor_ers Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3). Has no effect when \code{var_ers = 0}, but its length is still checked.
 #' @param seed Optional; seed for the random number generator.
 #' @details This function generates item and person parameters based on the BIRM-RS, and then simulates a dataset from these parameters.
+#'
+#' The difficulty (delta) of the first item is fixed at 0; all other
+#' difficulties are drawn from U(-3, 3) and all dispersions (tau) from U(0, 3).
+#' Within each trait, the last \code{x_num} items are reverse-scored (x = -1).
 #' @return A named list with two elements:
 #' \describe{
-#'   \item{df}{A data frame containing person parameters (latent traits, ERS, ARS) 
+#'   \item{df}{A data frame containing a person \code{id}, person parameters
+#'   (latent traits, ERS, ARS; ERS and ARS are 0 when their variance is 0)
 #'   and simulated item responses (prefixed with \code{observed_}).}
-#'   \item{items}{A data frame containing item parameters (delta, tau, x).}
+#'   \item{items}{A data frame containing item parameters (item_id, delta, tau, x).}
 #' }
 #' 
 #' @importFrom MASS mvrnorm
+#' @importFrom stats rbeta rnorm runif
 #' 
 #' @examples
 #' \dontrun{
@@ -50,7 +56,6 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
   if (is_auto(cor_thetas)) cor_thetas <- runif((theta_n*(theta_n - 1))/2, -0.4, 0.4)
   if (is_auto(x_num)) x_num <- floor(item_n/2)
   if (is_auto(cor_ers)) cor_ers <- runif(theta_n, -0.3, 0.3)
-  # df <- data.frame(id = 1:n)
 
   # check if length(item_n) is equal to theta_n
   if (length(item_n) != theta_n) {

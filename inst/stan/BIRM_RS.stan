@@ -23,7 +23,7 @@ parameters {
 transformed parameters {
   matrix[N, K] m;                     // first shape parameter for the Beta-distribution
   matrix[N, K] n;                     // second shape parameter for the Beta-distribution
-  matrix[theta_n + 1, theta_n + 1] L_Sigma = diag_pre_multiply(sigma, cholesky_decompose(Sigma_corr));    // build the covariance matrix for theta(s) and ERS
+  matrix[theta_n + 1, theta_n + 1] L_Sigma = diag_pre_multiply(sigma, cholesky_decompose(Sigma_corr));    // Cholesky factor of the covariance matrix for theta(s) and ERS
   vector[N] ers_exp;                  // create a vector for exp(ers)
 
   for (j in 1:N)
