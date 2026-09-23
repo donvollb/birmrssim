@@ -4,44 +4,60 @@
 \alias{one_simulation}
 \title{Simulates data, fits a model, and summarizes the fit}
 \usage{
-one_simulation(...)
+one_simulation(
+  n = 2000,
+  item_n = "auto",
+  theta_n = 1,
+  var_thetas = "auto",
+  var_ers = 0.3,
+  var_ars = 0.3,
+  cor_thetas = "auto",
+  x_num = "auto",
+  cor_ers = "auto",
+  seed = sample(1:1e+09, 1),
+  stan_model,
+  iter = 8000,
+  warmup = 4000,
+  chains = 6,
+  adapt_delta = 0.9,
+  ars_prior = 0.9,
+  init_vals = TRUE
+)
 }
 \arguments{
-\item{...}{Additional arguments passed to \code{\link{dgp_birm_rs}} and \code{\link{fit_stan}}.}
+\item{n}{Number of observations.}
 
-\item{n}{Number of observations (from \code{\link{dgp_birm_rs}}).}
+\item{item_n}{Number of items. For multiple traits, this can be a vector specifying the number of items per trait. When set to "auto" (default), it defaults to 10 items per trait.}
 
-\item{item_n}{Number of items or vector of items per trait; "auto" defaults to 10 (from \code{\link{dgp_birm_rs}}).}
+\item{theta_n}{Number of latent traits (passed to \code{\link{dgp_birm_rs}} and \code{\link{fit_stan}}).}
 
-\item{theta_n}{Number of latent traits (from \code{\link{dgp_birm_rs}} and \code{\link{fit_stan}}).}
+\item{var_thetas}{Variances of the latent traits. Defaults to 1 ("auto") for all traits.}
 
-\item{var_thetas}{Variances of latent traits (from \code{\link{dgp_birm_rs}}).}
+\item{var_ers}{Variance of the ERS parameter. Defaults to 0.3. Set to 0 to exclude ERS from the data-generating process.}
 
-\item{var_ers}{Variance of ERS parameter (from \code{\link{dgp_birm_rs}}). Set to 0 to exclude ERS.}
+\item{var_ars}{Variance of the ARS parameter. Defaults to 0.3. Set to 0 to exclude ARS from the data-generating process.}
 
-\item{var_ars}{Variance of ARS parameter (from \code{\link{dgp_birm_rs}}). Set to 0 to exclude ARS.}
+\item{cor_thetas}{Correlations among latent traits. For three traits, the order is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4) ("auto").}
 
-\item{x_num}{Number of reverse-scored items per trait (from \code{\link{dgp_birm_rs}}).}
+\item{x_num}{Number of reverse-scored items per trait. Defaults to floor(item_n/2) ("auto").}
 
-\item{cor_thetas}{Correlations between latent traits (from \code{\link{dgp_birm_rs}}).}
+\item{cor_ers}{Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3). Has no effect when \code{var_ers = 0}, but its length is still checked.}
 
-\item{cor_ers}{Correlations between ERS and latent traits (from \code{\link{dgp_birm_rs}}). Ignored when \code{var_ers = 0}.}
+\item{seed}{Seed for the random number generator (passed to \code{\link{dgp_birm_rs}} and \code{\link{fit_stan}}).}
 
-\item{seed}{Random seed (used by all functions).}
+\item{stan_model}{Path to the Stan model file.}
 
-\item{stan_model}{Path to the Stan model file (from \code{\link{fit_stan}}).}
+\item{iter}{Number of iterations (excluding warmup).}
 
-\item{iter}{Number of iterations excluding warmup (from \code{\link{fit_stan}}).}
+\item{warmup}{Number of warmup iterations.}
 
-\item{warmup}{Number of warmup iterations (from \code{\link{fit_stan}}).}
+\item{chains}{Number of MCMC chains.}
 
-\item{chains}{Number of MCMC chains (from \code{\link{fit_stan}}).}
+\item{adapt_delta}{Target acceptance probability for step size adaptation in Stan. Defaults to 0.9.}
 
-\item{adapt_delta}{Target acceptance probability for adaptation (from \code{\link{fit_stan}}).}
+\item{ars_prior}{Standard deviation of the normal prior on the ARS parameter (\code{ars ~ normal(0, ars_prior)}). Ignored by models without ARS. Default is 0.9.}
 
-\item{ars_prior}{Prior for ARS parameter (from \code{\link{fit_stan}}).}
-
-\item{init_vals}{Logical; whether to use initial values (from \code{\link{fit_stan}}).}
+\item{init_vals}{Logical; indicates whether to use initial values. Default is TRUE.}
 }
 \value{
 A named list containing:
@@ -57,6 +73,11 @@ A named list containing:
 This function acts as a wrapper for \code{\link{dgp_birm_rs}}, \code{\link{fit_stan}}, and \code{\link{summarize_fit}}. It first simulates data based on the specified parameters, fits the BIRM-RS model to the data, and finally summarizes the fit, including posterior summaries and RMSEs.
 }
 \details{
+The arguments \code{n} to \code{cor_ers} are passed to
+\code{\link{dgp_birm_rs}}, the arguments \code{stan_model} to
+\code{init_vals} to \code{\link{fit_stan}}, and \code{theta_n} and
+\code{seed} to both. The defaults are the same as in these functions.
+
 The arguments \code{x_vec}, \code{T_vec}, and \code{prefix} (passed to
 \code{\link{fit_stan}}) and \code{df_list} (passed to
 \code{\link{summarize_fit}}) are set automatically from the simulated data
@@ -65,8 +86,8 @@ and cannot be supplied by the user.
 \examples{
 \dontrun{
 result <- one_simulation(
-  n = 200, theta_n = 2, item_n = 10,
-  stan_model = "path/to/model.stan",
+  n = 200, theta_n = 2, item_n = c(10, 10),
+  stan_model = system.file("stan", "BIRM_RS.stan", package = "birmrssim"),
   iter = 1000, warmup = 500, chains = 2
 )
 }

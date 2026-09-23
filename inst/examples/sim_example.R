@@ -52,11 +52,12 @@ conditions_list <- list(
 # Step 3: Build the simulation grid
 # -----------------------------------------------------------------------------
 sim_grid <- expand.grid(conditions_list)
-sim_grid$stan_model <- as.character(sim_grid$stan_model)
 
 # Add condition and index columns
+# (expand.grid varies the last column, replication, slowest, so the conditions
+# repeat once per replication)
 sim_grid$condition <- rep(1:(nrow(sim_grid) / length(conditions_list$replication)),
-                          each = length(conditions_list$replication))
+                          times = length(conditions_list$replication))
 sim_grid$index <- 1:nrow(sim_grid)
 sim_grid <- sim_grid[, c("index", "condition", 
                           setdiff(names(sim_grid), c("index", "condition")))]
@@ -67,7 +68,7 @@ sim_grid$seed <- sample(1:1e7, size = nrow(sim_grid), replace = FALSE)
 # -----------------------------------------------------------------------------
 # Step 4: Run the simulations
 # -----------------------------------------------------------------------------
-# Use parallel_type = "multisession" on Windows or Linux,
+# Use parallel_type = "multisession" on all platforms,
 # "multicore" on Linux/macOS only, or "sequential" for testing.
 results_df <- sim_fun(
   sim_grid      = sim_grid,

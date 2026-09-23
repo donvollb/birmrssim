@@ -15,7 +15,16 @@ sim_fun(
 \arguments{
 \item{sim_grid}{A data frame containing the grid of simulation parameters,
 as created by \code{expand.grid()}. Each row represents one simulation
-condition. See examples for the expected structure.}
+condition. Required columns are \code{index} (unique row id, used in
+messages and file names), \code{n}, \code{theta_n}, \code{var_ers},
+\code{var_ars}, \code{ars_prior}, \code{chains}, \code{iter},
+\code{warmup}, \code{seed}, \code{stan_model}, and \code{init_vals};
+\code{adapt_delta} is optional. Trait-specific values are given in
+numbered columns (\code{item_n1}, \code{item_n2}, ...; likewise
+\code{x_num}, \code{var_thetas}, \code{cor_ers}, \code{cor_thetas}); all
+columns whose names contain the argument name are combined into one
+vector. Other columns (e.g. \code{replication}) are ignored but kept in
+the output. See examples for the expected structure.}
 
 \item{results_path}{File path to the directory where individual simulation
 result files are saved.}
@@ -55,7 +64,8 @@ results with \code{dplyr::bind_rows()}.
 
 Warnings generated during model fitting are caught and stored in the
 \code{warnings} element of each simulation result. Errors cause the
-simulation to fail gracefully, with the result padded with \code{NA} values
+simulation to fail gracefully: the error message is stored in the
+\code{error} element, and the result is padded with \code{NA} values
 to maintain a consistent structure in the returned data frame.
 
 Progress is reported via a text progress bar using the \pkg{progressr} package.

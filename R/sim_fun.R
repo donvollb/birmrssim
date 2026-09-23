@@ -5,8 +5,17 @@
 #' handles warnings and errors gracefully, and saves individual simulation results.
 #'
 #' @param sim_grid A data frame containing the grid of simulation parameters,
-#'   as created by \code{expand.grid()}. Each row represents one simulation 
-#'   condition. See examples for the expected structure.
+#'   as created by \code{expand.grid()}. Each row represents one simulation
+#'   condition. Required columns are \code{index} (unique row id, used in
+#'   messages and file names), \code{n}, \code{theta_n}, \code{var_ers},
+#'   \code{var_ars}, \code{ars_prior}, \code{chains}, \code{iter},
+#'   \code{warmup}, \code{seed}, \code{stan_model}, and \code{init_vals};
+#'   \code{adapt_delta} is optional. Trait-specific values are given in
+#'   numbered columns (\code{item_n1}, \code{item_n2}, ...; likewise
+#'   \code{x_num}, \code{var_thetas}, \code{cor_ers}, \code{cor_thetas}); all
+#'   columns whose names contain the argument name are combined into one
+#'   vector. Other columns (e.g. \code{replication}) are ignored but kept in
+#'   the output. See examples for the expected structure.
 #' @param results_path File path to the directory where individual simulation 
 #'   result files are saved.
 #' @param workers Number of parallel workers. Either a numeric value or one of 
@@ -31,8 +40,9 @@
 #' results with \code{dplyr::bind_rows()}.
 #'
 #' Warnings generated during model fitting are caught and stored in the 
-#' \code{warnings} element of each simulation result. Errors cause the 
-#' simulation to fail gracefully, with the result padded with \code{NA} values
+#' \code{warnings} element of each simulation result. Errors cause the
+#' simulation to fail gracefully: the error message is stored in the
+#' \code{error} element, and the result is padded with \code{NA} values
 #' to maintain a consistent structure in the returned data frame.
 #'
 #' Progress is reported via a text progress bar using the \pkg{progressr} package.
@@ -103,12 +113,8 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
   if (!dir.exists(results_path)) stop("results_path does not exist: ", results_path)
 
   # half would mean two cores per replication, quarter would mean four
-  if (workers == "half") workers <- future::availableCores() / 2 |> floor()
-  if (workers == "quarter") workers <- future::availableCores() / 4 |> floor()
-
-  # Initialize lists to store warnings and errors
-  warnings_list <- list()
-  errors_list <- list()
+  if (workers == "half") workers <- floor(future::availableCores() / 2)
+  if (workers == "quarter") workers <- floor(future::availableCores() / 4)
 
   # Compile all models once in the parent process
   model_files <- unique(sim_grid$stan_model) |> as.character()
@@ -117,9 +123,18 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
   # write a function to put it into the loop
   get_results <- function(row, results_path) {
 
+    # keep the column types of sim_grid: a row is handed over as a one-row data
+    # frame, factors (e.g. stan_model from expand.grid) become characters again
+    row <- as.list(row)
+    row <- lapply(row, function(v) if (is.factor(v)) as.character(v) else v)
+
+    # start each replication with an empty collector: a worker handles several rows
+    # in the same environment, so warnings would otherwise carry over
+    warnings_list <- character(0)
+
+    # index is only used here in sim_fun, so it is not passed on to one_simulation
     args <- list(
-      index      = row["index"] |> as.numeric(),
-      n          = row["n"] |> as.numeric(),
+      n        = row["n"] |> as.numeric(),
       theta_n    = row["theta_n"] |> as.numeric(),
       item_n     = row[grepl("item_n", names(row))] |> unlist() |> as.numeric(),
       var_ers    = row["var_ers"] |> as.numeric(),
@@ -137,19 +152,21 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
       init_vals    = row["init_vals"] |> as.logical()
     )
 
+    # adapt_delta is optional in sim_grid; only pass it on when it is there
+    if ("adapt_delta" %in% names(row)) args$adapt_delta <- row["adapt_delta"] |> as.numeric()
+
     
     # now build a tryCatch to handle warnings and errors
     results <- tryCatch(
       withCallingHandlers({
         do.call(one_simulation, args)
       }, warning = function(w) {
-        warnings_list <<- c(conditionMessage(w))
+        warnings_list <<- c(warnings_list, conditionMessage(w))
         message(sprintf("Warning during model fitting, index %s: ", row["index"]), 
                 conditionMessage(w))
         invokeRestart("muffleWarning")
       }),
       error = function(e) {
-        errors_list <<- c(conditionMessage(e))
         message(sprintf("Simulation failed, index %s: ", row["index"]), 
                 conditionMessage(e))
         return(list(summary = NA, warnings = NULL, error = conditionMessage(e)))
@@ -157,14 +174,13 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
     )
     
     # write warnings
-    if (length(warnings_list) > 0) results$warnings <- warnings_list 
+    # unique(): fit$summary() repeats the same message many times per replication
+    if (length(warnings_list) > 0) results$warnings <- unique(warnings_list)
 
     # build a results row with the sim_grid row and the results
-    results$summary <- c(row, results$summary) |> as.data.frame() 
+    # (for failed simulations, summary is NA, so the row gets one extra column)
+    results$summary <- c(row, results$summary) |> as.data.frame()
 
-    # if there are NAs (non-convergance), be sure it still works
-    if (ncol(results$summary) == 1) results$summary <- t(results$summary) |> as.data.frame()
-    
     # now save this row
     df_row <- results$summary 
 
@@ -191,12 +207,11 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
   # do the loop with the progressbar and future along the rows of the grid
   with_progress({
     p <- progressor(along = 1:nrow(sim_grid))
-    results_df <- future.apply::future_apply(
-      sim_grid, 
-      MARGIN = 1, 
-      FUN = function(row) {
+    results_df <- future.apply::future_lapply(
+      seq_len(nrow(sim_grid)),
+      FUN = function(i) {
         p(sprintf("Processing a row"))
-        get_results(row, results_path = results_path)
+        get_results(sim_grid[i, , drop = FALSE], results_path = results_path)
       },
       future.seed = TRUE
     )
@@ -205,7 +220,7 @@ sim_fun <- function(sim_grid, results_path, workers = "half", save_all = TRUE, p
 
   # right now in our results_df, we have a list with one row per single replication (so not a df yet)
   # check if there are any failed sims
-  # these only have on col more than the sim_grid
+  # these only have one col more than the sim_grid
   failed_sims <- which(sapply(results_df, function(df) ncol(df) == ncol(sim_grid) + 1))
 
   # get a simulation row which worked (more cols)

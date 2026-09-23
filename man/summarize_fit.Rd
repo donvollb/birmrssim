@@ -19,9 +19,11 @@ inferred from the column names of \code{df_list$df}.}
 A named list with three elements:
 \describe{
 \item{summary}{A one-row data frame containing performance measures
-(correlations, bias, RMSE) for all person and item parameters, estimated
-correlations among person parameters, Cholesky factor elements of the
-covariance matrix, and model fit indices (LOO-CV, WAIC).}
+(correlation, bias, absolute bias, RMSE) for all person and item
+parameters, variance, mean, and median of the person parameter
+estimates, estimated correlations among person parameters, Cholesky
+factor elements of the covariance matrix, and model fit indices
+(LOO-CV, WAIC).}
 \item{post_means}{A named list of posterior means for all person and item
 parameters (latent traits, delta, tau, and ERS/ARS when present in the
 fitted model).}
@@ -30,9 +32,10 @@ for all model parameters.}
 }
 }
 \description{
-Summarizes the results from a fit object, including means, standard deviations,
-minima, and maxima of the posterior distributions of the model parameters, as
-well as the root mean squared error (RMSE) of the model parameter estimates.
+Summarizes the results from a fit object by comparing the posterior means of
+the model parameters with their true values (correlation, bias, absolute bias,
+and root mean squared error (RMSE)), and reports model fit indices and MCMC
+diagnostics.
 }
 \details{
 The presence of ERS and ARS is detected automatically from the variable names
@@ -44,8 +47,10 @@ set to \code{NA}, and the \code{L_Sigma} block is always output as a
 when ERS is absent). This keeps the output structure identical across all four
 model variants so that results can be combined with \code{dplyr::bind_rows()}.
 
-Performance measures (correlations, bias, RMSE) are computed by comparing
-posterior means to the true values used in the data generating process.
+Performance measures (correlation, bias, absolute bias, RMSE) are computed by
+comparing posterior means to the true values used in the data generating
+process. For person parameters, the variance, mean, and median of the
+posterior means are reported as well.
 Correlations between person parameters (ERS, ARS, latent traits) are based
 on posterior means rather than full posterior distributions.
 

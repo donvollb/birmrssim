@@ -41,9 +41,9 @@ fit_stan(
 
 \item{adapt_delta}{Target acceptance probability for step size adaptation in Stan. Defaults to 0.9.}
 
-\item{prefix}{Optional prefix indicating which variables to analyze. If NULL, all columns are used. Default is "observed".}
+\item{prefix}{Optional pattern selecting the item response columns; matched anywhere in the column names via \code{grepl()}. If NULL, all columns are used. Default is "observed".}
 
-\item{ars_prior}{Prior for the ARS parameter. Default is 0.9.}
+\item{ars_prior}{Standard deviation of the normal prior on the ARS parameter (\code{ars ~ normal(0, ars_prior)}). Ignored by models without ARS. Default is 0.9.}
 
 \item{init_vals}{Logical; indicates whether to use initial values. Default is TRUE.}
 }
@@ -67,14 +67,18 @@ The Stan model files included in this package can be accessed via
 }
 Example: \code{system.file("stan", "BIRM_RS.stan", package = "birmrssim")}
 
-If \code{init_vals = TRUE}, initial values are drawn randomly for all chain
-parameters to facilitate convergence.
+If \code{init_vals = TRUE}, one set of initial values is created and used
+for all chains to facilitate convergence: \code{theta}, \code{delta}, and
+(if present) \code{ars} are drawn randomly, \code{tau} is set to 1.5,
+\code{sigma} to 1, and \code{Sigma_corr} to the identity matrix. If
+\code{init_vals = FALSE}, Stan's default initialization is used.
 }
 \examples{
 \dontrun{
+sim <- dgp_birm_rs(n = 300, item_n = c(4, 4), theta_n = 2, x_num = c(2, 2))
 model_path <- system.file("stan", "BIRM_RS.stan", package = "birmrssim")
-results <- fit_stan(data, stan_model = model_path, theta_n = 2,
-                    x_vec = c(rep(1, 4), rep(-1, 4)), iter = 8000, warmup = 4000, chains = 6,
+results <- fit_stan(sim$df, stan_model = model_path, theta_n = 2,
+                    x_vec = sim$items$x, iter = 8000, warmup = 4000, chains = 6,
                     seed = sample(1:1e9, 1), adapt_delta = 0.9, prefix = "observed", init_vals = TRUE)
 }
 }

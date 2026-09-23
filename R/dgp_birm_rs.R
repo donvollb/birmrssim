@@ -9,17 +9,23 @@
 #' @param var_ars Variance of the ARS parameter. Defaults to 0.3. Set to 0 to exclude ARS from the data-generating process.
 #' @param x_num Number of reverse-scored items per trait. Defaults to floor(item_n/2) ("auto").
 #' @param cor_thetas Correlations among latent traits. For three traits, the order is: cor(theta1, theta2), cor(theta1, theta3), cor(theta2, theta3). Defaults to runif((theta_n*(theta_n - 1))/2, -0.4, 0.4) ("auto").
-#' @param cor_ers Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3). Ignored when \code{var_ers = 0}.
+#' @param cor_ers Correlations between ERS and latent traits. For three traits, the order is: cor(theta1, ERS), cor(theta2, ERS), cor(theta3, ERS). Defaults to runif(theta_n, -0.3, 0.3). Has no effect when \code{var_ers = 0}, but its length is still checked.
 #' @param seed Optional; seed for the random number generator.
 #' @details This function generates item and person parameters based on the BIRM-RS, and then simulates a dataset from these parameters.
+#'
+#' The difficulty (delta) of the first item is fixed at 0; all other
+#' difficulties are drawn from U(-3, 3) and all dispersions (tau) from U(0, 3).
+#' Within each trait, the last \code{x_num} items are reverse-scored (x = -1).
 #' @return A named list with two elements:
 #' \describe{
-#'   \item{df}{A data frame containing person parameters (latent traits, ERS, ARS) 
+#'   \item{df}{A data frame containing a person \code{id}, person parameters
+#'   (latent traits, ERS, ARS; ERS and ARS are 0 when their variance is 0)
 #'   and simulated item responses (prefixed with \code{observed_}).}
-#'   \item{items}{A data frame containing item parameters (delta, tau, x).}
+#'   \item{items}{A data frame containing item parameters (item_id, delta, tau, x).}
 #' }
 #' 
 #' @importFrom MASS mvrnorm
+#' @importFrom stats rbeta rnorm runif
 #' 
 #' @examples
 #' \dontrun{
@@ -40,13 +46,16 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
   include_ERS <- var_ers > 0
   include_ARS <- var_ars > 0
 
+
+  # "auto" check that also copes with empty arguments (e.g. cor_thetas for a single trait)
+  is_auto <- function(x) is.character(x) && length(x) > 0 && x[1] == "auto"
+
   # simulate values if none were set
-  if (item_n[1] == "auto") item_n <- rep(10, theta_n)
-  if (var_thetas[1] == "auto") var_thetas <- rep(1, theta_n)
-  if (cor_thetas[1] == "auto") cor_thetas <- runif((theta_n*(theta_n - 1))/2, -0.4, 0.4)
-  if (x_num[1] == "auto") x_num <- floor(item_n/2)
-  if (cor_ers[1] == "auto") cor_ers <- runif(theta_n, -0.3, 0.3)
-  # df <- data.frame(id = 1:n)
+  if (is_auto(item_n)) item_n <- rep(10, theta_n)
+  if (is_auto(var_thetas)) var_thetas <- rep(1, theta_n)
+  if (is_auto(cor_thetas)) cor_thetas <- runif((theta_n*(theta_n - 1))/2, -0.4, 0.4)
+  if (is_auto(x_num)) x_num <- floor(item_n/2)
+  if (is_auto(cor_ers)) cor_ers <- runif(theta_n, -0.3, 0.3)
 
   # check if length(item_n) is equal to theta_n
   if (length(item_n) != theta_n) {
@@ -67,14 +76,16 @@ dgp_birm_rs <- function(n = 2000, item_n = "auto", theta_n = 1,
 
 
   # 1. Create the covariance matrix for the latent traits (theta)
-  CovTheta <- diag(var_thetas)  # Start with a diagonal matrix using the variances
-  counter <- 1
-  for (i in 1:(theta_n - 1)) {
-    for (j in (i + 1):theta_n) {
-      # Fill the off-diagonals with the appropriate covariance computed from cor_thetas
-      CovTheta[i, j] <- cor_thetas[counter] * sqrt(var_thetas[i] * var_thetas[j])
-      CovTheta[j, i] <- CovTheta[i, j]  # ensure symmetry
-      counter <- counter + 1
+  CovTheta <- diag(var_thetas, nrow = theta_n)  # Start with a diagonal matrix using the variances
+  if (theta_n > 1) {
+    counter <- 1
+    for (i in 1:(theta_n - 1)) {
+      for (j in (i + 1):theta_n) {
+        # Fill the off-diagonals with the appropriate covariance computed from cor_thetas
+        CovTheta[i, j] <- cor_thetas[counter] * sqrt(var_thetas[i] * var_thetas[j])
+        CovTheta[j, i] <- CovTheta[i, j]  # ensure symmetry
+        counter <- counter + 1
+      }
     }
   }
   
